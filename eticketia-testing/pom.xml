@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>dev.corusoft.eticketia</groupId>
+        <artifactId>eticketia-backend-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+    
+    <artifactId>eticketia-testing</artifactId>
+    <version>${revision}</version>
+    <inceptionYear>2025</inceptionYear>
+    <description>Module for integration testing and mocking</description>
+    <packaging>jar</packaging>
+    
+    <properties>
+    
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>dev.corusoft.eticketia</groupId>
+            <artifactId>eticketia-server</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+    
+    </dependencies>
+    
+    <build>
+        <finalName>${project.build.finalName}</finalName>
+    
+    </build>
+
+</project>

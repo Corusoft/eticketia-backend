@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.0</version>
+    </parent>
+    
+    <groupId>dev.corusoft.eticketia</groupId>
+    <artifactId>eticketia-backend-parent</artifactId>
+    <version>${revision}</version>
+    <inceptionYear>2025</inceptionYear>
+    <name>Eticketia Parent</name>
+    <description>Parent module with dependencies and common project configuration</description>
+    <packaging>pom</packaging>
+    
+    <prerequisites>
+        <maven>3.9.8</maven>
+    </prerequisites>
+    
+    <modules>
+        <module>eticketia-domain</module>
+        <module>eticketia-application</module>
+        <module>eticketia-infrastructure</module>
+        <module>eticketia-shared</module>
+        <module>eticketia-testing</module>
+        <module>eticketia-server</module>
+    </modules>
+    
+    <properties>
+        <revision>0.1-SNAPSHOT</revision>
+        <!-- Project properties -->
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
+        
+        <!-- CI/CD configuration -->
+        
+        <!-- Dependencies versioning -->
+        <spring-boot-starter>3.5.0</spring-boot-starter>
+        <spring-boot-configuration-processor>${spring-boot-starter}</spring-boot-configuration-processor>
+        <spring-boot-docker-compose>${spring-boot-starter}</spring-boot-docker-compose>
+        <spring-boot-starter-data-jpa>${spring-boot-starter}</spring-boot-starter-data-jpa>
+        <spring-boot-starter-data-rest>${spring-boot-starter}</spring-boot-starter-data-rest>
+        <spring-boot-starter-log4j2>${spring-boot-starter}</spring-boot-starter-log4j2>
+        <spring-boot-starter-security>${spring-boot-starter}</spring-boot-starter-security>
+        <spring-boot-starter-test>${spring-boot-starter}</spring-boot-starter-test>
+        <spring-boot-starter-validation>${spring-boot-starter}</spring-boot-starter-validation>
+        <spring-boot-starter-web>${spring-boot-starter}</spring-boot-starter-web>
+        <spring-boot-testcontainers>${spring-boot-starter}</spring-boot-testcontainers>
+        <spring-security-test>6.4.4</spring-security-test>
+        <lombok>1.18.38</lombok>
+        
+        <!-- Plugins -->
+        <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
+        <maven-plugins_maven-compiler-plugin>3.14.0</maven-plugins_maven-compiler-plugin>
+        <maven-plugins_maven-jar-plugin>3.4.2</maven-plugins_maven-jar-plugin>
+        <maven-plugins_maven-help-plugin>3.5.1</maven-plugins_maven-help-plugin>
+        <maven-clean-plugin>3.4.1</maven-clean-plugin>
+        <maven-resources-plugin>3.3.1</maven-resources-plugin>
+        <maven-compiler-plugin>3.14.0</maven-compiler-plugin>
+        <maven-surefire-plugin>3.5.3</maven-surefire-plugin>
+        <maven-jar-plugin>3.4.2</maven-jar-plugin>
+        <maven-install-plugin>3.1.4</maven-install-plugin>
+        <maven-checkstyle-plugin>3.6.0</maven-checkstyle-plugin>
+        <maven-enforcer-plugin>3.5.0</maven-enforcer-plugin>
+        <checkstyle>10.25.0</checkstyle>
+        <google_sortpom-plugin>2.3.1</google_sortpom-plugin>
+    </properties>
+    
+    <build>
+        <finalName>${project.build.finalName}</finalName>
+        
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin}</version>
+                </plugin>
+                <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven-install-plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        <plugins>
+            <!-- Lombok configuration -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin}</version>
+                <configuration>
+                    <!-- Do not consider this module (and children) as the main application -->
+                    <skip>true</skip>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            
+            <!-- Maven plugins configuration -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-plugins_maven-compiler-plugin}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <compilerArgs>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            
+            <!-- Show current execution details -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>${maven-plugins_maven-help-plugin}</version>
+                <executions>
+                    <execution>
+                        <!-- Show active profiles on compile time -->
+                        <id>show-active-profile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Code formatting -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <consoleOutput>false</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-code-style</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- POM sorting -->
+            <plugin>
+                <groupId>com.google.code.sortpom</groupId>
+                <artifactId>maven-sortpom-plugin</artifactId>
+                <version>${google_sortpom-plugin}</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sortProperties>true</sortProperties>
+                    <nrOfIndentSpace>4</nrOfIndentSpace>
+                    <sortDependencies>groupId,artifactId</sortDependencies>
+                    <sortPlugins>groupId,artifactId</sortPlugins>
+                    <keepBlankLines>true</keepBlankLines>
+                    <expandEmptyElements>false</expandEmptyElements>
+                </configuration>
+            </plugin>
+        
+        </plugins>
+    
+    </build>
+    
+    <dependencies>
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring-boot-configuration-processor}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-docker-compose</artifactId>
+            <version>${spring-boot-docker-compose}</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot-starter-data-jpa}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+            <version>${spring-boot-starter-data-rest}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot-starter}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <version>${spring-boot-starter-log4j2}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot-starter-security}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot-starter-test}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>${spring-boot-starter-validation}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot-starter-web}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <version>${spring-boot-testcontainers}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>${spring-security-test}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok}</version>
+            <scope>compile</scope>
+        </dependency>
+    
+    </dependencies>
+    
+    <profiles>
+        <!-- Development profile: dev  -->
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <activatedProperties>dev</activatedProperties>      <!-- Use application-dev.yml -->
+                <maven.test.skip>true</maven.test.skip>             <!-- Skip tests -->
+            </properties>
+        
+        </profile>
+        
+        <!-- Production profile: prod -->
+        <profile>
+            <id>production</id>
+            <properties>
+                <activatedProperties>prod</activatedProperties>       <!-- Use application-prod.yml -->
+                <maven.test.skip>true</maven.test.skip>               <!-- Skip tests -->
+            </properties>
+            
+            <build>
+                <plugins>
+                    <!-- Force project to be production ready -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven-enforcer-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-production-ready</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <phase>validate</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <rules>
+                                <requireReleaseVersion>
+                                    <message>Application is not ready for production: current version is ${revision}
+                                    </message>
+                                </requireReleaseVersion>
+                            </rules>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    
+    </profiles>
+
+</project>
