@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <!-- Variables -->
+        <Property name="logsDir">logs/testing</Property>
+        <Property name="oldRollingLogFileName">${logsDir}/old/logs-%d{yyyy-MM-dd}_%i.log</Property>
+        
+        <!-- Properties to be logged -->
+        <Property name="date">%d{ISO8601}</Property>
+        <Property name="thread">[%t]</Property>
+        <Property name="level">%-5level</Property>
+        <Property name="logger">%class{-3}.%method:%line</Property>
+        <Property name="message">%msg</Property>
+        <Property name="logFormat">${level} ${thread} ${date} || ${logger} -- ${message} %n</Property>
+    </Properties>
+    
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${logFormat}"/>
+        </Console>
+        
+        <RollingFile name="RollingFile" fileName="${logsDir}/logs.log" filePattern="${oldRollingLogFileName}">
+            <PatternLayout>
+                <Pattern>${logFormat}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+    
+    </Appenders>
+    
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+        
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.application"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.domain"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.infrastructure"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.shared"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.server"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.testing"/>
+    
+    </Loggers>
+</Configuration>

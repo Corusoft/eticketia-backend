@@ -1,0 +1,10 @@
+name: eticketia-testing-stack
+
+networks:
+  eticketia-test-network:
+    driver: bridge
+
+volumes:
+  eticketia-test-volume:
+    driver: local
+

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -11,18 +10,22 @@
     
     <artifactId>eticketia-server</artifactId>
     <version>${revision}</version>
-    <inceptionYear>2025</inceptionYear>
+    <packaging>jar</packaging>
     <name>Eticketia Server</name>
     <description>Automatic receipt scanning tool</description>
-    <packaging>jar</packaging>
+    <inceptionYear>2025</inceptionYear>
     
-    <properties>
-    </properties>
+    <properties/>
     
     <dependencies>
         <dependency>
             <groupId>dev.corusoft.eticketia</groupId>
             <artifactId>eticketia-application</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.corusoft.eticketia</groupId>
+            <artifactId>eticketia-infrastructure</artifactId>
             <version>${revision}</version>
         </dependency>
     
@@ -32,21 +35,21 @@
         <finalName>${project.build.finalName}</finalName>
         
         <plugins>
-            <!-- Consider this module as the main application -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin}</version>
-                <configuration>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
             
             <!-- Check all modules are in same version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>${maven-enforcer-plugin}</version>
+                <configuration>
+                    <rules>
+                        <requireSameVersions>
+                            <dependencies>
+                                <dependency>${project.parent.groupId}</dependency>
+                            </dependencies>
+                        </requireSameVersions>
+                    </rules>
+                </configuration>
                 <executions>
                     <execution>
                         <id>enforce-updated-project-modules</id>
@@ -56,14 +59,31 @@
                         <phase>verify</phase>
                     </execution>
                 </executions>
+            </plugin>
+            
+            <!-- Show active profiles in modules -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>${maven-plugins_maven-help-plugin}</version>
+                <executions>
+                    <execution>
+                        <!-- Show active profiles on compile time -->
+                        <id>show-active-profile</id>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Consider this module as the main application -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin}</version>
                 <configuration>
-                    <rules>
-                        <requireSameVersions>
-                            <dependencies>
-                                <dependency>${project.parent.groupId}</dependency>
-                            </dependencies>
-                        </requireSameVersions>
-                    </rules>
+                    <skip>false</skip>
                 </configuration>
             </plugin>
         </plugins>
