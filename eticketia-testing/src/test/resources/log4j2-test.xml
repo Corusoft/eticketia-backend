@@ -11,7 +11,7 @@
         <Property name="level">%-5level</Property>
         <Property name="logger">%class{-3}.%method:%line</Property>
         <Property name="message">%msg</Property>
-        <Property name="logFormat">${level} ${thread} ${date} || ${logger} -- ${message} %n</Property>
+        <Property name="logFormat">${thread} ${level} ${date} || ${logger} -- ${message} %n</Property>
     </Properties>
     
     <Appenders>
@@ -41,7 +41,6 @@
         <Logger level="DEBUG" name="dev.corusoft.eticketia.application"/>
         <Logger level="DEBUG" name="dev.corusoft.eticketia.domain"/>
         <Logger level="DEBUG" name="dev.corusoft.eticketia.infrastructure"/>
-        <Logger level="DEBUG" name="dev.corusoft.eticketia.shared"/>
         <Logger level="DEBUG" name="dev.corusoft.eticketia.server"/>
         <Logger level="DEBUG" name="dev.corusoft.eticketia.testing"/>
     

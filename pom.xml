@@ -25,43 +25,29 @@
         <module>eticketia-domain</module>
         <module>eticketia-application</module>
         <module>eticketia-infrastructure</module>
-        <module>eticketia-shared</module>
         <module>eticketia-testing</module>
         <module>eticketia-server</module>
     </modules>
     
     <properties>
-        <checkstyle>10.25.0</checkstyle>
+        <revision>0.1-SNAPSHOT</revision>
+        <project.classifier>spring-boot-application</project.classifier>
+        
         <!-- Project properties -->
         <java.version>21</java.version>
-        <lombok>1.18.38</lombok>
-        <maven-checkstyle-plugin>3.6.0</maven-checkstyle-plugin>
-        <maven-clean-plugin>3.4.1</maven-clean-plugin>
-        <maven-compiler-plugin>3.14.0</maven-compiler-plugin>
-        <maven-enforcer-plugin>3.5.0</maven-enforcer-plugin>
-        <maven-install-plugin>3.1.4</maven-install-plugin>
-        <maven-jar-plugin>3.4.2</maven-jar-plugin>
-        <maven-plugins_maven-compiler-plugin>3.14.0</maven-plugins_maven-compiler-plugin>
-        <maven-plugins_maven-help-plugin>3.5.1</maven-plugins_maven-help-plugin>
-        <maven-plugins_maven-jar-plugin>3.4.2</maven-plugins_maven-jar-plugin>
-        <maven-resources-plugin>3.3.1</maven-resources-plugin>
-        <maven-surefire-plugin>3.5.3</maven-surefire-plugin>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>0.1-SNAPSHOT</revision>
-        <sortpom-plugin>4.0.0</sortpom-plugin>
-        <spring-boot-configuration-processor>${spring-boot-starter}</spring-boot-configuration-processor>
-        <spring-boot-docker-compose>${spring-boot-starter}</spring-boot-docker-compose>
-        
-        <!-- Plugins -->
-        <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
+        <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
         
         <!-- CI/CD configuration -->
+        <!-- TODO Crear proyecto en SonarQube y configurar API KEY -->
+        <!-- <sonar.projectKey></sonar.projectKey> -->
         
         <!-- Dependencies versioning -->
         <spring-boot-starter>3.5.0</spring-boot-starter>
+        <spring-boot-configuration-processor>${spring-boot-starter}</spring-boot-configuration-processor>
+        <spring-boot-docker-compose>${spring-boot-starter}</spring-boot-docker-compose>
         <spring-boot-starter-data-jpa>${spring-boot-starter}</spring-boot-starter-data-jpa>
         <spring-boot-starter-data-rest>${spring-boot-starter}</spring-boot-starter-data-rest>
         <spring-boot-starter-log4j2>${spring-boot-starter}</spring-boot-starter-log4j2>
@@ -71,11 +57,26 @@
         <spring-boot-starter-web>${spring-boot-starter}</spring-boot-starter-web>
         <spring-boot-testcontainers>${spring-boot-starter}</spring-boot-testcontainers>
         <spring-security-test>6.4.4</spring-security-test>
+        <lombok>1.18.38</lombok>
+        <jacoco>0.8.13</jacoco>
         <testng>7.10.0</testng>
+        <checkstyle>10.25.0</checkstyle>
+        
+        <!-- Plugins -->
+        <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
+        <maven-checkstyle-plugin>3.6.0</maven-checkstyle-plugin>
+        <maven-clean-plugin>3.4.1</maven-clean-plugin>
+        <maven-compiler-plugin>3.14.0</maven-compiler-plugin>
+        <maven-enforcer-plugin>3.5.0</maven-enforcer-plugin>
+        <maven-install-plugin>3.1.4</maven-install-plugin>
+        <maven-jar-plugin>3.4.2</maven-jar-plugin>
+        <maven-help-plugin>3.5.1</maven-help-plugin>
+        <maven-resources-plugin>3.3.1</maven-resources-plugin>
+        <maven-surefire-plugin>3.5.3</maven-surefire-plugin>
+        <maven-sonar-plugin>4.0.0.4121</maven-sonar-plugin>
     </properties>
     
     <dependencies>
-        
         <!-- Log4J2 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -90,6 +91,7 @@
             <version>${lombok}</version>
             <scope>compile</scope>
         </dependency>
+        
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -137,7 +139,32 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot-starter-web}</version>
         </dependency>
-    
+        
+        <!-- Crypto -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.80</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.80</version>
+        </dependency>
+        
+        <!-- Serialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+        </dependency>
     </dependencies>
     
     <build>
@@ -169,35 +196,83 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin}</version>
+                    <configuration>
+                        <includes>
+                            <!-- Unit tests naming convention -->
+                            <include>**/*UnitTest.java</include>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <!-- Tests naming convention -->
+                            <include>**/*IT.java</include>
+                            <include>**/*IntegrationTest.java</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <phase>compile</phase>
+                        </execution>
+                        
+                        <execution>
+                            <id>report-aggregate</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                        </execution>
+                        
+                        <execution>
+                            <id>prepare-agent-integration-test</id>
+                            <goals>
+                                <goal>prepare-agent-integration</goal>
+                            </goals>
+                        </execution>
+                        
+                        <execution>
+                            <id>report-multimodule-integration-test</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report-integration</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <dataFileIncludes>
+                            <dataFileInclude>**/jacoco.exec</dataFileInclude>
+                        </dataFileIncludes>
+                        <outputDirectory>
+                            ${project.reporting.outputDirectory}/jacoco-aggregate
+                        </outputDirectory>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
         
         <plugins>
-            
-            <!-- POM sorting -->
-            <plugin>
-                <groupId>com.github.ekryd.sortpom</groupId>
-                <artifactId>sortpom-maven-plugin</artifactId>
-                <version>${sortpom-plugin}</version>
-                <configuration>
-                    <sortProperties>true</sortProperties>
-                    <nrOfIndentSpace>4</nrOfIndentSpace>
-                    <sortDependencies>groupId,artifactId</sortDependencies>
-                    <sortPlugins>groupId,artifactId</sortPlugins>
-                    <keepBlankLines>true</keepBlankLines>
-                    <expandEmptyElements>false</expandEmptyElements>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>sort</goal>
-                        </goals>
-                        <phase>verify</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            
             <!-- Code formatting -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -231,7 +306,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-plugins_maven-compiler-plugin}</version>
+                <version>${maven-compiler-plugin}</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -245,22 +320,6 @@
                             <version>${lombok}</version>
                         </path>
                     </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <!-- Lombok configuration -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin}</version>
-                <configuration>
-                    <!-- Do not consider this module (and children) as the main application -->
-                    <skip>true</skip>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
                 </configuration>
             </plugin>
         
@@ -290,8 +349,25 @@
             <properties>
                 <!-- Read configuration from application-test.yaml -->
                 <activatedProperties>test</activatedProperties>
+                <maven.test.skip>false</maven.test.skip>
             </properties>
-        
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         
         <!-- Production profile: prod -->

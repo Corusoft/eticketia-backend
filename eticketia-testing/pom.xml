@@ -2,7 +2,9 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <parent>
+        <relativePath>../pom.xml</relativePath>
         <groupId>dev.corusoft.eticketia</groupId>
         <artifactId>eticketia-backend-parent</artifactId>
         <version>${revision}</version>
@@ -15,7 +17,6 @@
     <inceptionYear>2025</inceptionYear>
     
     <properties>
-        <jacoco>0.8.13</jacoco>
         <!-- Dependencies versioning -->
         <javafaker>1.0.2</javafaker>
     </properties>
@@ -25,31 +26,21 @@
             <groupId>dev.corusoft.eticketia</groupId>
             <artifactId>eticketia-domain</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dev.corusoft.eticketia</groupId>
             <artifactId>eticketia-application</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dev.corusoft.eticketia</groupId>
             <artifactId>eticketia-infrastructure</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>dev.corusoft.eticketia</groupId>
-            <artifactId>eticketia-shared</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dev.corusoft.eticketia</groupId>
             <artifactId>eticketia-server</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
         </dependency>
         
         <!-- Apache -->
@@ -96,12 +87,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId>
-            <version>${spring-boot-starter}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>${spring-security-test}</version>
@@ -124,15 +109,6 @@
         <resources>
             <resource>
                 <filtering>true</filtering>
-                <directory>src/..</directory>
-                <includes>
-                    <include>*.env</include>
-                    <include>compose.test.yaml</include>
-                </includes>
-            </resource>
-            
-            <resource>
-                <filtering>true</filtering>
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*.xml</include>
@@ -153,11 +129,10 @@
         </testResources>
         
         <plugins>
-            <!-- Run parallel tests -->
+            <!-- Unit testing -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin}</version>
                 <configuration>
                     <parallel>classes</parallel>
                     <threadCount>2</threadCount>
@@ -166,7 +141,30 @@
                     </argLine>
                 </configuration>
             </plugin>
+            
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
         </plugins>
+        
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${maven-sonar-plugin}</version>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sonar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     
     </build>
     
@@ -175,43 +173,23 @@
             <id>testing</id>
             <build>
                 <plugins>
-                    
                     <!-- Use Failsafe for integration testing -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>${maven-failsafe-plugin.version}</version>
                         <executions>
                             <execution>
                                 <goals>
                                     <goal>integration-test</goal>
-                                    <goal>verify</goal>
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
+                    
                     <!-- Jacoco configuration -->
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${jacoco}</version>
-                        <executions>
-                            <!-- Prepare agent to inspect code -->
-                            <execution>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <phase>test-compile</phase>
-                            </execution>
-                            <!-- Generate reports -->
-                            <execution>
-                                <id>report-results</id>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                                <phase>post-integration-test</phase>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

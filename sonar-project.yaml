@@ -1,0 +1,5 @@
+sonar:
+  java:
+    source: 11
+  coverage:
+    minimumCoverage: 75

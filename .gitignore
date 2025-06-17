@@ -36,3 +36,5 @@ build/
 *.env
 *.pem
 logs
+
+eticketia-server_*.jar

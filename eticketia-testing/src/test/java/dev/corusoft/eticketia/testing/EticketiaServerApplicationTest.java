@@ -12,8 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = {EticketiaServerApplication.class})
 class EticketiaServerApplicationTest {
 
+  private final EticketiaServerApplication serverApplication;
+
   @Autowired
-  private EticketiaServerApplication serverApplication;
+  EticketiaServerApplicationTest(EticketiaServerApplication serverApplication) {
+    this.serverApplication = serverApplication;
+  }
 
   @Test
   void springTestContextLoads() {

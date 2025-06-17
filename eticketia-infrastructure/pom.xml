@@ -3,6 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
+        <relativePath>../pom.xml</relativePath>
         <groupId>dev.corusoft.eticketia</groupId>
         <artifactId>eticketia-backend-parent</artifactId>
         <version>${revision}</version>
@@ -15,7 +16,6 @@
     <inceptionYear>2025</inceptionYear>
     
     <properties>
-        <bouncycastle-cryptography>1.81</bouncycastle-cryptography>
         <!-- Dependencies versioning -->
         <jsonwebtoken-jjwt>0.12.6</jsonwebtoken-jjwt>
         <postgres>42.7.5</postgres>
@@ -30,11 +30,6 @@
         <dependency>
             <groupId>dev.corusoft.eticketia</groupId>
             <artifactId>eticketia-application</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.corusoft.eticketia</groupId>
-            <artifactId>eticketia-shared</artifactId>
             <version>${revision}</version>
         </dependency>
         
@@ -63,18 +58,7 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jsonwebtoken-jjwt}</version>
         </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>${bouncycastle-cryptography}</version>
-        </dependency>
         
-        <!-- Crypto -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>${bouncycastle-cryptography}</version>
-        </dependency>
         
         <!-- Drivers -->
         <dependency>
