@@ -1,0 +1,19 @@
+{
+  "name": "eticketia-backend",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Corusoft/eticketia-backend.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "type": "commonjs",
+  "homepage": "https://github.com/Corusoft/eticketia-backend#readme",
+  "devDependencies": {
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "husky": "9.1.7"
+  }
+}
