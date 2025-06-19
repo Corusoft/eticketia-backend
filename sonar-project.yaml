@@ -7,6 +7,10 @@ sonar:
     file:
       patterns:
         - **/*.java
+        - **/*.xml
+        - **/*.properties
+        - **/*.yaml
+  language: java
   java:
     source: 21
     binaries: target/classes,target/test-classes
@@ -19,7 +23,7 @@ sonar:
     coverage:
       exclusions:
         - eticketia-testing/src/test/**
-        - eticketia-server/src/main/java/**/EticketiaServerApplication.java
+        - **/EticketiaServerApplication.java
         - **/*.xml
     jacoco:
       xmlReportPaths:
@@ -28,5 +32,5 @@ sonar:
   exclusions:
     - **/generated-sources/**
     - **/target/**
-    - eticketia-server/src/main/java/**/EticketiaServerApplication.java
+    - **/EticketiaServerApplication.java
     - eticketia-testing/src/main/**
