@@ -17,6 +17,10 @@
     <inceptionYear>2025</inceptionYear>
     
     <properties>
+        <!-- Code coverage -->
+        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
+        
         <!-- Dependencies versioning -->
         <javafaker>1.0.2</javafaker>
     </properties>

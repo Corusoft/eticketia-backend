@@ -18,19 +18,22 @@ sonar:
     - eticketia-**/src/main/java
   tests:
     - eticketia-testing/src/test/java
+  checkstyle:
+    reportPaths:
+      - eticketia-**/target
   coverage:
     minimumCoverage: 75
     coverage:
       exclusions:
         - eticketia-testing/src/test/**
         - **/EticketiaServerApplication.java
-        - **/*.xml
+        - eticketia-**/*.xml
     jacoco:
       xmlReportPaths:
-        - target/site/jacoco/jacoco.xml
-        - target/site/jacoco-aggregate/jacoco.xml
+        - eticketia-**/target/site/jacoco/
+        - eticketia-**/target/site/jacoco-aggregate
   exclusions:
-    - **/generated-sources/**
-    - **/target/**
+    - eticketia-**/generated-sources/**
+    - eticketia-**/target/**
     - **/EticketiaServerApplication.java
     - eticketia-testing/src/main/**

@@ -16,6 +16,10 @@
     <inceptionYear>2025</inceptionYear>
     
     <properties>
+        <!-- Code coverage -->
+        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
+        
         <!-- Dependencies versioning -->
         <jsonwebtoken-jjwt>0.12.6</jsonwebtoken-jjwt>
         <postgres>42.7.5</postgres>

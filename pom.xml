@@ -46,6 +46,9 @@
         <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
         <!-- Location of Jacoco reports -->
         <aggregate.report.dir>target/site/jacoco-aggregate</aggregate.report.dir>
+        <!-- Code coverage -->
+        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
         
         <!-- Dependencies versioning -->
         <spring-boot-starter>3.5.0</spring-boot-starter>
