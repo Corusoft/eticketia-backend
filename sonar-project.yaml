@@ -19,6 +19,7 @@ sonar:
     coverage:
       exclusions:
         - eticketia-testing/src/test/**
+        - eticketia-server/src/main/java/**/EticketiaServerApplication.java
         - **/*.xml
     jacoco:
       xmlReportPaths:
@@ -27,4 +28,5 @@ sonar:
   exclusions:
     - **/generated-sources/**
     - **/target/**
+    - eticketia-server/src/main/java/**/EticketiaServerApplication.java
     - eticketia-testing/src/main/**
