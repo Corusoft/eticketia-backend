@@ -10,17 +10,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @Log4j2
 @SpringBootTest(classes = {EticketiaServerApplication.class})
-class EticketiaServerApplicationTest {
+class EticketiaServerApplicationUnitTest {
 
   private final EticketiaServerApplication serverApplication;
 
   @Autowired
-  EticketiaServerApplicationTest(EticketiaServerApplication serverApplication) {
+  EticketiaServerApplicationUnitTest(EticketiaServerApplication serverApplication) {
     this.serverApplication = serverApplication;
   }
 
   @Test
-  void springTestContextLoads() {
+  void springContextLoadsForUnitTests() {
     assertThat(serverApplication).isNotNull();
     log.debug("Application context loaded succesfuly for testing environment.");
   }

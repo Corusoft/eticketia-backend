@@ -41,8 +41,11 @@
         <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
         
         <!-- CI/CD configuration -->
-        <!-- TODO Crear proyecto en SonarQube y configurar API KEY -->
-        <!-- <sonar.projectKey></sonar.projectKey> -->
+        <sonar.organization>corusoft</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
+        <!-- Location of Jacoco reports -->
+        <aggregate.report.dir>target/site/jacoco-aggregate</aggregate.report.dir>
         
         <!-- Dependencies versioning -->
         <spring-boot-starter>3.5.0</spring-boot-starter>
@@ -194,16 +197,18 @@
                     <version>${maven-resources-plugin}</version>
                 </plugin>
                 <plugin>
+                    <!-- Unit testing -->
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin}</version>
                     <configuration>
                         <includes>
                             <!-- Unit tests naming convention -->
                             <include>**/*UnitTest.java</include>
-                            <include>**/*Test.java</include>
+                            <include>**/*UT.java</include>
                         </includes>
                     </configuration>
                 </plugin>
+                <!-- Integration testing -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
@@ -230,11 +235,19 @@
                     <version>${jacoco}</version>
                     <executions>
                         <execution>
-                            <id>prepare-agent</id>
+                            <id>prepare-jacoco-agent-for-test</id>
+                            <phase>compile</phase>
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
+                        </execution>
+                        
+                        <execution>
+                            <id>prepare-jacoco-agent-for-integration-test</id>
                             <phase>compile</phase>
+                            <goals>
+                                <goal>prepare-agent-integration</goal>
+                            </goals>
                         </execution>
                         
                         <execution>
@@ -242,13 +255,6 @@
                             <phase>verify</phase>
                             <goals>
                                 <goal>report-aggregate</goal>
-                            </goals>
-                        </execution>
-                        
-                        <execution>
-                            <id>prepare-agent-integration-test</id>
-                            <goals>
-                                <goal>prepare-agent-integration</goal>
                             </goals>
                         </execution>
                         
@@ -263,9 +269,10 @@
                     <configuration>
                         <dataFileIncludes>
                             <dataFileInclude>**/jacoco.exec</dataFileInclude>
+                            <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
                         </dataFileIncludes>
                         <outputDirectory>
-                            ${project.reporting.outputDirectory}/jacoco-aggregate
+                            ${aggregate.report.dir}
                         </outputDirectory>
                     </configuration>
                 </plugin>

@@ -2,6 +2,10 @@
 
 Automatic ticket scanning
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Corusoft_eticketia-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Corusoft_eticketia-backend)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Corusoft_eticketia-backend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Corusoft_eticketia-backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Corusoft_eticketia-backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Corusoft_eticketia-backend)
+
 # Entorno de desarrollo
 
 ## Git Hooks y Conventional Commits
