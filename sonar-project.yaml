@@ -28,10 +28,6 @@ sonar:
         - eticketia-testing/src/test/**
         - **/EticketiaServerApplication.java
         - eticketia-**/*.xml
-    jacoco:
-      xmlReportPaths:
-        - eticketia-**/target/site/jacoco/
-        - eticketia-**/target/site/jacoco-aggregate
   exclusions:
     - eticketia-**/generated-sources/**
     - eticketia-**/target/**

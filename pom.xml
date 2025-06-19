@@ -45,7 +45,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
         <!-- Location of Jacoco reports -->
-        <aggregate.report.dir>target/site/jacoco-aggregate</aggregate.report.dir>
+        <aggregate.report.dir>jacoco-aggregate</aggregate.report.dir>
         <!-- Code coverage -->
         <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
