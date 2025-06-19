@@ -44,10 +44,11 @@
         <sonar.organization>corusoft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
+        <sonar.project.settings>${project.basedir}/sonar-project.yaml</sonar.project.settings>
         <!-- Location of Jacoco reports -->
-        <aggregate.report.dir>jacoco-aggregate</aggregate.report.dir>
+        <jacoco.aggregate.report.file>jacoco-aggregate/jacoco.xml</jacoco.aggregate.report.file>
         <!-- Code coverage -->
-        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${aggregate.report.dir}
+        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${jacoco.aggregate.report.file}
         </sonar.coverage.jacoco.xmlReportPaths>
         
         <!-- Dependencies versioning -->
@@ -275,7 +276,7 @@
                             <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
                         </dataFileIncludes>
                         <outputDirectory>
-                            ${aggregate.report.dir}
+                            ${jacoco.aggregate.report.file}
                         </outputDirectory>
                     </configuration>
                 </plugin>
