@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.0</version>
+    </parent>
+    
+    <groupId>dev.corusoft.eticketia</groupId>
+    <artifactId>eticketia-backend-parent</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>Eticketia Parent</name>
+    <description>Parent module with dependencies and common project configuration</description>
+    <inceptionYear>2025</inceptionYear>
+    
+    <prerequisites>
+        <maven>3.9.8</maven>
+    </prerequisites>
+    
+    <modules>
+        <module>eticketia-domain</module>
+        <module>eticketia-application</module>
+        <module>eticketia-infrastructure</module>
+        <module>eticketia-testing</module>
+        <module>eticketia-server</module>
+    </modules>
+    
+    <properties>
+        <revision>0.1-SNAPSHOT</revision>
+        <project.classifier>spring-boot-application</project.classifier>
+        
+        <!-- Project properties -->
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
+        
+        <!-- CI/CD configuration -->
+        <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
+        <sonar.organization>corusoft</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.project.settings>${project.basedir}/sonar-project.properties</sonar.project.settings>
+        <!-- Code coverage -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        
+        <!-- Dependencies versioning -->
+        <spring-boot-starter>3.5.0</spring-boot-starter>
+        <spring-boot-configuration-processor>${spring-boot-starter}</spring-boot-configuration-processor>
+        <spring-boot-docker-compose>${spring-boot-starter}</spring-boot-docker-compose>
+        <spring-boot-starter-data-jpa>${spring-boot-starter}</spring-boot-starter-data-jpa>
+        <spring-boot-starter-data-rest>${spring-boot-starter}</spring-boot-starter-data-rest>
+        <spring-boot-starter-log4j2>${spring-boot-starter}</spring-boot-starter-log4j2>
+        <spring-boot-starter-security>${spring-boot-starter}</spring-boot-starter-security>
+        <spring-boot-starter-test>${spring-boot-starter}</spring-boot-starter-test>
+        <spring-boot-starter-validation>${spring-boot-starter}</spring-boot-starter-validation>
+        <spring-boot-starter-web>${spring-boot-starter}</spring-boot-starter-web>
+        <spring-boot-testcontainers>${spring-boot-starter}</spring-boot-testcontainers>
+        <spring-security-test>6.4.4</spring-security-test>
+        <lombok>1.18.38</lombok>
+        <jacoco>0.8.13</jacoco>
+        <testng>7.10.0</testng>
+        <checkstyle>10.25.0</checkstyle>
+        
+        <!-- Plugins -->
+        <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
+        <maven-checkstyle-plugin>3.6.0</maven-checkstyle-plugin>
+        <maven-clean-plugin>3.4.1</maven-clean-plugin>
+        <maven-compiler-plugin>3.14.0</maven-compiler-plugin>
+        <maven-enforcer-plugin>3.5.0</maven-enforcer-plugin>
+        <maven-install-plugin>3.1.4</maven-install-plugin>
+        <maven-jar-plugin>3.4.2</maven-jar-plugin>
+        <maven-help-plugin>3.5.1</maven-help-plugin>
+        <maven-resources-plugin>3.3.1</maven-resources-plugin>
+        <maven-surefire-plugin>3.5.3</maven-surefire-plugin>
+        <maven-sonar-plugin>4.0.0.4121</maven-sonar-plugin>
+    </properties>
+    
+    <dependencies>
+        <!-- Log4J2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok}</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring-boot-configuration-processor}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-docker-compose</artifactId>
+            <version>${spring-boot-docker-compose}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot-starter}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+            <version>${spring-boot-starter-data-rest}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <version>${spring-boot-starter-log4j2}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot-starter-security}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>${spring-boot-starter-validation}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot-starter-web}</version>
+        </dependency>
+        
+        <!-- Crypto -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.80</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.80</version>
+        </dependency>
+        
+        <!-- Serialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <finalName>${project.build.finalName}</finalName>
+        
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven-install-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin}</version>
+                </plugin>
+                <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin}</version>
+                </plugin>
+                <plugin>
+                    <!-- Unit testing -->
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin}</version>
+                    <configuration>
+                        <includes>
+                            <!-- Unit tests naming convention -->
+                            <include>**/*UnitTest.java</include>
+                            <include>**/*UT.java</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+                <!-- Integration testing -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <!-- Tests naming convention -->
+                            <include>**/*IT.java</include>
+                            <include>**/*IntegrationTest.java</include>
+                        </includes>
+                        <argLine>@{argLine}
+                            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                        </argLine>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-jacoco-agent-for-test</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        
+                        <execution>
+                            <id>prepare-jacoco-agent-for-integration-test</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>prepare-agent-integration</goal>
+                            </goals>
+                        </execution>
+                        
+                        <execution>
+                            <id>report-integration-test</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report-integration</goal>
+                            </goals>
+                        </execution>
+                        
+                        <execution>
+                            <id>generate-project-coverage-reports</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <dataFileIncludes>
+                            <dataFileInclude>**/jacoco.exec</dataFileInclude>
+                            <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
+                        </dataFileIncludes>
+                    
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        <plugins>
+            <!-- Code formatting -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin}</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <consoleOutput>false</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>check-code-style</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Maven plugins configuration -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <compilerArgs>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        
+        </plugins>
+    
+    </build>
+    
+    <profiles>
+        <!-- Development profile: dev  -->
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- Read configuration from application-dev.yaml -->
+                <activatedProperties>dev</activatedProperties>
+                <!-- Skip tests -->
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        
+        </profile>
+        
+        <!-- Testing profile: test  -->
+        <profile>
+            <id>testing</id>
+            <properties>
+                <!-- Read configuration from application-test.yaml -->
+                <activatedProperties>test</activatedProperties>
+                <maven.test.skip>false</maven.test.skip>
+            </properties>
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <!-- Production profile: prod -->
+        <profile>
+            <id>production</id>
+            <properties>
+                <!-- Read configuration from application-prod.yaml -->
+                <activatedProperties>prod</activatedProperties>
+                <!-- Skip tests -->
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+            
+            <build>
+                <plugins>
+                    <!-- Force project to be production ready -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven-enforcer-plugin}</version>
+                        <configuration>
+                            <rules>
+                                <requireReleaseVersion>
+                                    <message>Application is not ready for production: current version is ${revision}
+                                    </message>
+                                </requireReleaseVersion>
+                            </rules>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>enforce-production-ready</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <phase>validate</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    
+    </profiles>
+
+</project>

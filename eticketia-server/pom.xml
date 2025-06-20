@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <relativePath>../pom.xml</relativePath>
+        <groupId>dev.corusoft.eticketia</groupId>
+        <artifactId>eticketia-backend-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+    
+    <artifactId>eticketia-server</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+    <name>Eticketia Server</name>
+    <description>Automatic receipt scanning tool</description>
+    <inceptionYear>2025</inceptionYear>
+    
+    <properties>
+        <!-- Code coverage -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>dev.corusoft.eticketia</groupId>
+            <artifactId>eticketia-application</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.corusoft.eticketia</groupId>
+            <artifactId>eticketia-infrastructure</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    
+    </dependencies>
+    
+    <build>
+        <finalName>${project.build.finalName}.jar</finalName>
+        
+        <plugins>
+            <!-- Check all modules are in same version -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin}</version>
+                <configuration>
+                    <rules>
+                        <requireSameVersions>
+                            <dependencies>
+                                <dependency>${project.parent.groupId}</dependency>
+                            </dependencies>
+                        </requireSameVersions>
+                    </rules>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>enforce-updated-project-modules</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Show active profiles in modules -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>${maven-help-plugin}</version>
+                <executions>
+                    <execution>
+                        <!-- Show active profiles on compile time -->
+                        <id>show-active-profile</id>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Consider this module as the main application -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>${project.classifier}</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Copy application JAR to proyect root directory -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.7.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-server-jar-to-root-directory</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>dev.corusoft.eticketia</groupId>
+                                    <artifactId>eticketia-server</artifactId>
+                                    <version>${revision}</version>
+                                    <classifier>${project.classifier}</classifier>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.parent.build.directory}</outputDirectory>
+                                    <destFileName>${project.build.finalName}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

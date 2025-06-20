@@ -1,0 +1,12 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+      file: 'compose.test.yaml'
+      lifecycle-management: start_and_stop
+      skip:
+        in-tests: false
+
+eticketia:
+  banner:
+    projectName: '[@activatedProperties@ mode] @artifactId@_@project.version@'

@@ -1,0 +1,22 @@
+spring:
+  config:
+    import:
+      - classpath:infrastructure.yaml
+  application:
+    name: Eticketia
+  profiles:
+    active: '@activatedProperties@'
+  docker:
+    compose:
+      enabled: false
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  http2:
+    enabled: true
+
+eticketia:
+  banner:
+    projectName: '@artifactId@_@project.version@'

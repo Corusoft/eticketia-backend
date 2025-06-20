@@ -1,0 +1,11 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+logging:
+  config: 'classpath:log4j2-dev.xml'
+
+eticketia:
+  banner:
+    projectName: '[@activatedProperties@ mode] @artifactId@_@project.version@'

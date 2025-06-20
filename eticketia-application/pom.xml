@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <relativePath>../pom.xml</relativePath>
+        <groupId>dev.corusoft.eticketia</groupId>
+        <artifactId>eticketia-backend-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+    
+    <artifactId>eticketia-application</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+    <description>Module for bussiness logic and use cases</description>
+    <inceptionYear>2025</inceptionYear>
+    
+    <properties>
+        <!-- Code coverage -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>dev.corusoft.eticketia</groupId>
+            <artifactId>eticketia-domain</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    
+    </dependencies>
+    
+    <build>
+        <finalName>${project.build.finalName}</finalName>
+    
+    </build>
+
+</project>
