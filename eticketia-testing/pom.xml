@@ -18,7 +18,8 @@
     
     <properties>
         <!-- Code coverage -->
-        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${jacoco.aggregate.report.file}
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         
         <!-- Dependencies versioning -->
@@ -54,6 +55,11 @@
             <version>${maven-failsafe-plugin.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.17.0</version>
+        </dependency>
         
         <!-- Code coverage -->
         <dependency>
@@ -61,6 +67,12 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>${jacoco}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <!-- Mocking and data generation -->
@@ -156,6 +168,12 @@
                             <goal>report-aggregate</goal>
                         </goals>
                         <phase>verify</phase>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.parent.reporting.outputDirectory}/jacoco-resources
+                            </outputDirectory>
+                            <title>${project.parent.name} coverage report</title>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -166,6 +184,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${maven-sonar-plugin}</version>
                     <executions>
                         <execution>
                             <phase>verify</phase>

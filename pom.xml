@@ -41,14 +41,13 @@
         <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
         
         <!-- CI/CD configuration -->
+        <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
         <sonar.organization>corusoft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
-        <sonar.project.settings>${project.basedir}/sonar-project.yaml</sonar.project.settings>
-        <!-- Location of Jacoco reports -->
-        <jacoco.aggregate.report.file>jacoco-aggregate/jacoco.xml</jacoco.aggregate.report.file>
+        <sonar.project.settings>${project.basedir}/sonar-project.properties</sonar.project.settings>
         <!-- Code coverage -->
-        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/${jacoco.aggregate.report.file}
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         
         <!-- Dependencies versioning -->
@@ -230,6 +229,9 @@
                             <include>**/*IT.java</include>
                             <include>**/*IntegrationTest.java</include>
                         </includes>
+                        <argLine>@{argLine}
+                            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                        </argLine>
                     </configuration>
                 </plugin>
                 
@@ -275,9 +277,7 @@
                             <dataFileInclude>**/jacoco.exec</dataFileInclude>
                             <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
                         </dataFileIncludes>
-                        <outputDirectory>
-                            ${jacoco.aggregate.report.file}
-                        </outputDirectory>
+                    
                     </configuration>
                 </plugin>
             </plugins>
