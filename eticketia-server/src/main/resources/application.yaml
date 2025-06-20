@@ -3,7 +3,7 @@ spring:
     import:
       - classpath:infrastructure.yaml
   application:
-    name: 'Eticketia'
+    name: Eticketia
   profiles:
     active: '@activatedProperties@'
   docker:
@@ -20,4 +20,3 @@ server:
 eticketia:
   banner:
     projectName: '@artifactId@_@project.version@'
-

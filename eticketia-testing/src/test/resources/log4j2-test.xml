@@ -2,8 +2,9 @@
 <Configuration status="WARN">
     <Properties>
         <!-- Variables -->
-        <Property name="logsDir">logs/testing</Property>
-        <Property name="oldRollingLogFileName">${logsDir}/old/logs-%d{yyyy-MM-dd}_%i.log</Property>
+        <Property name="logsDir">../logs/testing</Property>
+        <Property name="rollingFileName">${logsDir}/logs.log</Property>
+        <Property name="rollingFilePattern">${logsDir}/old/logs-%d{yyyy-MM-dd}_%i.log</Property>
         
         <!-- Properties to be logged -->
         <Property name="date">%d{ISO8601}</Property>
@@ -19,7 +20,7 @@
             <PatternLayout pattern="${logFormat}"/>
         </Console>
         
-        <RollingFile name="RollingFile" fileName="${logsDir}/logs.log" filePattern="${oldRollingLogFileName}">
+        <RollingFile name="RollingFile" fileName="${rollingFileName}" filePattern="${rollingFilePattern}">
             <PatternLayout>
                 <Pattern>${logFormat}</Pattern>
             </PatternLayout>

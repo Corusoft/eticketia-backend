@@ -2,8 +2,9 @@
 <Configuration status="WARN">
     <Properties>
         <!-- Variables -->
-        <Property name="logsDir">logs/testing</Property>
-        <Property name="oldRollingLogFileName">${logsDir}/old/logs-%d{yyyy-MM-dd}_%i.log</Property>
+        <Property name="logsDir">logs/dev</Property>
+        <Property name="rollingFileName">${logsDir}/logs.log</Property>
+        <Property name="rollingFilePattern">${logsDir}/old/logs-%d{yyyy-MM-dd}_%i.log</Property>
         
         <!-- Properties to be logged -->
         <Property name="date">%d{ISO8601}</Property>
@@ -19,7 +20,7 @@
             <PatternLayout pattern="${logFormat}"/>
         </Console>
         
-        <RollingFile name="RollingFile" fileName="${logsDir}/logs.log" filePattern="${oldRollingLogFileName}">
+        <RollingFile name="RollingFile" fileName="${rollingFileName}" filePattern="${rollingFilePattern}">
             <PatternLayout>
                 <Pattern>${logFormat}</Pattern>
             </PatternLayout>
@@ -33,15 +34,15 @@
     </Appenders>
     
     <Loggers>
-        <Root level="INFO">
+        <Root level="WARN">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Root>
         
-        <Logger level="INFO" name="dev.corusoft.eticketia.application"/>
-        <Logger level="INFO" name="dev.corusoft.eticketia.domain"/>
-        <Logger level="INFO" name="dev.corusoft.eticketia.infrastructure"/>
-        <Logger level="INFO" name="dev.corusoft.eticketia.server"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.application"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.domain"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.infrastructure"/>
+        <Logger level="DEBUG" name="dev.corusoft.eticketia.server"/>
     
     </Loggers>
 </Configuration>

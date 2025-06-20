@@ -121,7 +121,7 @@
                                     <version>${revision}</version>
                                     <classifier>${project.classifier}</classifier>
                                     <type>jar</type>
-                                    <outputDirectory>${project.basedir}/..</outputDirectory>
+                                    <outputDirectory>${project.parent.build.directory}</outputDirectory>
                                     <destFileName>${project.build.finalName}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>

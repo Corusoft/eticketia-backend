@@ -257,18 +257,18 @@
                         </execution>
                         
                         <execution>
-                            <id>report-aggregate</id>
-                            <phase>verify</phase>
+                            <id>report-integration-test</id>
+                            <phase>post-integration-test</phase>
                             <goals>
-                                <goal>report-aggregate</goal>
+                                <goal>report-integration</goal>
                             </goals>
                         </execution>
                         
                         <execution>
-                            <id>report-multimodule-integration-test</id>
-                            <phase>post-integration-test</phase>
+                            <id>generate-project-coverage-reports</id>
+                            <phase>verify</phase>
                             <goals>
-                                <goal>report-integration</goal>
+                                <goal>report-aggregate</goal>
                             </goals>
                         </execution>
                     </executions>

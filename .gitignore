@@ -37,5 +37,4 @@ build/
 *.pem
 logs
 
-eticketia-server_*.jar
 /node_modules/
