@@ -23,7 +23,7 @@
         
         <!-- Dependencies versioning -->
         <jsonwebtoken-jjwt>0.12.6</jsonwebtoken-jjwt>
-        <postgres>42.7.5</postgres>
+        <postgres>42.7.7</postgres>
     </properties>
     
     <dependencies>
