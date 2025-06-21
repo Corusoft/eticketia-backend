@@ -67,6 +67,7 @@
         <jacoco>0.8.13</jacoco>
         <testng>7.10.0</testng>
         <checkstyle>10.25.0</checkstyle>
+        <bouncycastle>1.80</bouncycastle>
         
         <!-- Plugins -->
         <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
@@ -144,18 +145,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot-starter-web}</version>
-        </dependency>
-        
-        <!-- Crypto -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.80</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.80</version>
         </dependency>
         
         <!-- Serialization -->
