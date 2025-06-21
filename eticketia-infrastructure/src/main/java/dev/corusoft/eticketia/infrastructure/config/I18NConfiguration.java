@@ -3,7 +3,6 @@ package dev.corusoft.eticketia.infrastructure.config;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +15,7 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
  * Confogures aspects related with I18N and translations
  */
 @Configuration
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class I18NConfiguration {
   private static final Locale DEFAULT_LOCALE = Locale.of("es");
   private static final List<Locale> SUPPORTED_LOCALES = List.of(
