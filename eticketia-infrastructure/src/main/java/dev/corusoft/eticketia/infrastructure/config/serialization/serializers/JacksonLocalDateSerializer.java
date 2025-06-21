@@ -1,4 +1,4 @@
-package dev.corusoft.eticketia.infrastructure.serialization.serializers;
+package dev.corusoft.eticketia.infrastructure.config.serialization.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

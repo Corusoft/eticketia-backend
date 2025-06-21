@@ -1,12 +1,12 @@
-package dev.corusoft.eticketia.infrastructure.serialization;
+package dev.corusoft.eticketia.infrastructure.config.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import dev.corusoft.eticketia.infrastructure.serialization.deserializers.JacksonLocalDateDeserializer;
-import dev.corusoft.eticketia.infrastructure.serialization.deserializers.JacksonLocalDateTimeDeserializer;
-import dev.corusoft.eticketia.infrastructure.serialization.serializers.JacksonLocalDateSerializer;
-import dev.corusoft.eticketia.infrastructure.serialization.serializers.JacksonLocalDateTimeSerializer;
+import dev.corusoft.eticketia.infrastructure.config.serialization.deserializers.JacksonLocalDateDeserializer;
+import dev.corusoft.eticketia.infrastructure.config.serialization.deserializers.JacksonLocalDateTimeDeserializer;
+import dev.corusoft.eticketia.infrastructure.config.serialization.serializers.JacksonLocalDateSerializer;
+import dev.corusoft.eticketia.infrastructure.config.serialization.serializers.JacksonLocalDateTimeSerializer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
