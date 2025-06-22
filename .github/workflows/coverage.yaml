@@ -71,9 +71,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify \
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          org.sonarsource.scanner.maven:sonar-maven-plugin:5.1.0.4751 \
           -Dsonar.projectKey=Corusoft_eticketia-backend \
-          -Dproject.settings=sonar-project.yaml \
+          -Dproject.settings=sonar-project.properties \
           -Ptesting
 
       - name: 🧹 Clean environment
