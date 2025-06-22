@@ -67,6 +67,7 @@
         <jacoco>0.8.13</jacoco>
         <testng>7.10.0</testng>
         <checkstyle>10.25.0</checkstyle>
+        <bouncycastle>1.80</bouncycastle>
         
         <!-- Plugins -->
         <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
@@ -146,18 +147,6 @@
             <version>${spring-boot-starter-web}</version>
         </dependency>
         
-        <!-- Crypto -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.80</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.80</version>
-        </dependency>
-        
         <!-- Serialization -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -193,48 +182,19 @@
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar-plugin}</version>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Build-Time>${maven.build.timestamp}</Build-Time>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
                 </plugin>
                 <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${maven-resources-plugin}</version>
                 </plugin>
-                <plugin>
-                    <!-- Unit testing -->
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin}</version>
-                    <configuration>
-                        <includes>
-                            <!-- Unit tests naming convention -->
-                            <include>**/*UnitTest.java</include>
-                            <include>**/*UT.java</include>
-                        </includes>
-                    </configuration>
-                </plugin>
-                <!-- Integration testing -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven-failsafe-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <includes>
-                            <!-- Tests naming convention -->
-                            <include>**/*IT.java</include>
-                            <include>**/*IntegrationTest.java</include>
-                        </includes>
-                        <argLine>@{argLine}
-                            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
-                        </argLine>
-                    </configuration>
-                </plugin>
-                
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
@@ -313,7 +273,7 @@
                 </executions>
             </plugin>
             
-            <!-- Maven plugins configuration -->
+            <!-- Maven compiler configuration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -331,6 +291,26 @@
                             <version>${lombok}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            
+            <!-- Skip unit tests by default -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            
+            <!-- Skip integration tests by default -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
         

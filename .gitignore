@@ -36,5 +36,6 @@ build/
 *.env
 *.pem
 logs
+test-output
 
 /node_modules/

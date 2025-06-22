@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Application entry point.
  */
-@SpringBootApplication
+@SpringBootApplication(
+    scanBasePackages = "dev.corusoft.eticketia"
+)
 @Log4j2
 public class EticketiaServerApplication {
 

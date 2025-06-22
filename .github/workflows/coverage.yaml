@@ -12,8 +12,10 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened ]
 env:
-  TEST_ENV_FILE: .test.env      # Test environment variables
-  SEGMENT_DOWNLOAD_tIMEOUT_MINS: '5'    # Time to consider a cache miss
+  # Test environment variables
+  TEST_ENV_FILE: ./eticketia-testing/.test.env
+  # Time to consider as failed downloading cached dependencies
+  SEGMENT_DOWNLOAD_TIMEOUT_MINS: '5'
 jobs:
   build:
     name: Build and analyze
@@ -47,7 +49,7 @@ jobs:
         env:
           TEST_ENV_FILE_CONTENT: ${{ secrets.TEST_ENV_CONTENT }}
         run: |
-          echo "$TEST_ENV_CONTENT" > $TEST_ENV_FILE
+          echo $TEST_ENV_FILE_CONTENT > $TEST_ENV_FILE
 
       - name: 📚 Cache Maven packages
         uses: actions/cache@v4
@@ -71,7 +73,7 @@ jobs:
           mvn -B verify \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=Corusoft_eticketia-backend \
-          -Dproject.settings=sonar-project.yaml \
+          -Dproject.settings=sonar-project.properties \
           -Ptesting
 
       - name: 🧹 Clean environment

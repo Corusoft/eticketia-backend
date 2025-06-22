@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="IntegrationTestingSuite" parallel="tests" thread-count="2" time-out="300000">
+    <test name="IntegrationTest">
+        <packages>
+            <package name="dev.corusoft.eticketia.testing.integration"/>
+        </packages>
+    </test>
+</suite>
