@@ -42,11 +42,11 @@ public class EnvironmentVariablesConfiguration {
     File envFile = new File(ENV_FILE_PATH);
     if (!envFile.exists()) {
       log.warn(
-          "The configuration file '{}' was not found. Environmental variables will be loaded from default settings.",
+          "The environment configuration file '{}' was not found. Environmental variables will be loaded from default settings.",
           envFile.getPath());
       return;
     }
 
-    log.debug("Environmental configuration loaded from '{}'.", ENV_FILE_PATH);
+    log.debug("Environment configuration loaded from '{}'.", ENV_FILE_PATH);
   }
 }
