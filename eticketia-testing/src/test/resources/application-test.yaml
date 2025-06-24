@@ -9,4 +9,4 @@ spring:
 
 eticketia:
   banner:
-    projectName: '[@activatedProperties@ mode] @artifactId@_@project.version@'
+    buildName: '[@activatedProperties@ mode] @artifactId@_@project.version@'
