@@ -8,8 +8,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import dev.corusoft.eticketia.domain.entities.roles.RoleName;
-import dev.corusoft.eticketia.infrastructure.external.firebase.FirebaseAuthenticatedUserDetails;
 import dev.corusoft.eticketia.infrastructure.security.CustomSecurityFilter;
+import dev.corusoft.eticketia.infrastructure.services.firebase.FirebaseAuthenticatedUserDetails;
+import dev.corusoft.eticketia.infrastructure.web.ApiPaths;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,8 +43,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
     implements CustomSecurityFilter {
-  private FirebaseAuth firebaseAuth;
-  private String authorizationHeaderTokenValue;
+  private static final List<String> PUBLIC_ENDPOINTS = List.of(
+      ApiPaths.AUTH_SIGNUP
+  );
+
+  private final FirebaseAuth firebaseAuth;
 
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res,
@@ -53,12 +58,13 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
     }
 
     try {
+      String authorizationHeaderTokenValue = extractTokenFromRequest(req);
       FirebaseToken decodedToken = firebaseAuth.verifyIdToken(authorizationHeaderTokenValue, true);
       UsernamePasswordAuthenticationToken authToken = buildAuthenticationToken(decodedToken, req);
       SecurityContextHolder.getContext().setAuthentication(authToken);
     } catch (FirebaseAuthException e) {
       log.error("Could not verify Firebase token");
-      throw new RuntimeException(e);
+      throw new ServletException(e);
     }
 
 
@@ -68,15 +74,18 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
 
   @Override
   public boolean canApplyFilter(HttpServletRequest req) {
-    String token;
     try {
-      token = extractTokenFromRequest(req);
-      authorizationHeaderTokenValue = token;
-      return true;
-    } catch (BadCredentialsException e) {
+      return !isPublicEndpoint(req);
+    } catch (Exception e) {
       log.debug("Can not apply filter {} : {}", getClass().getName(), e.getMessage());
       return false;
     }
+  }
+
+  private boolean isPublicEndpoint(HttpServletRequest req) {
+    String path = req.getServletPath();
+
+    return PUBLIC_ENDPOINTS.contains(path);
   }
 
   private UsernamePasswordAuthenticationToken buildAuthenticationToken(FirebaseToken token,

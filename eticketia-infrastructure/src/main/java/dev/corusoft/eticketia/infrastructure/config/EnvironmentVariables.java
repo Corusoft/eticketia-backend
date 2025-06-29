@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public enum EnvironmentVariables {
-  FIREBASE_CREDENTIALS("FIREBASE_CREDENTIALS", true);
+  FIREBASE_CREDENTIALS("firebase_credentials", true);
 
-  private static final String ENCODED_SUFFIX = ".ENCODED";
+  private static final String ENCODED_SUFFIX = ".encoded";
   /**
    * Name of the property in the {@code .*.env} file.
    */

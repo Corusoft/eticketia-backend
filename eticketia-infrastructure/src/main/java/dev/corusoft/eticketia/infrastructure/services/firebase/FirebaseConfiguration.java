@@ -1,8 +1,9 @@
-package dev.corusoft.eticketia.infrastructure.external.firebase;
+package dev.corusoft.eticketia.infrastructure.services.firebase;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import dev.corusoft.eticketia.infrastructure.config.EnvironmentConfiguration;
 import dev.corusoft.eticketia.infrastructure.config.EnvironmentVariables;
 import jakarta.annotation.PostConstruct;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -24,14 +25,13 @@ public class FirebaseConfiguration {
   private final EnvironmentConfiguration env;
   private FirebaseApp firebaseApp;
 
-  @Value("${spring.application.name}")
-  private String applicationName;
-
   /**
    * Initialize Firebase Application using file credentials.
    */
   @PostConstruct
   public void initFirebaseApp() throws IOException {
+    String applicationName = env.getProperty("spring.application.name");
+
     String firebaseCredentials = env.getProperty(EnvironmentVariables.FIREBASE_CREDENTIALS);
     InputStream credentialStreams = new ByteArrayInputStream(firebaseCredentials.getBytes());
 
@@ -43,7 +43,17 @@ public class FirebaseConfiguration {
     // Avoid multiple initializations
     if (FirebaseApp.getApps().isEmpty()) {
       firebaseApp = FirebaseApp.initializeApp(firebaseOptions, applicationName);
-      log.debug("Firebase application '{}' initialized succesfuly", firebaseApp.getName());
+      log.debug("Firebase App '{}' initialized", firebaseApp.getName());
     }
+  }
+
+  @Bean
+  public FirebaseAuth firebaseAuth() {
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+    log.debug("Firebase Auth '{}' initialized",
+        firebaseApp.getName()
+    );
+
+    return firebaseAuth;
   }
 }

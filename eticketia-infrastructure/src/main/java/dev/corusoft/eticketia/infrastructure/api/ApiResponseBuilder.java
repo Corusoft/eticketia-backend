@@ -16,7 +16,7 @@ public class ApiResponseBuilder {
   /**
    * Builds a successful response with empty body
    */
-  public static ApiResponse<Void> buildEmptySuccessApiResponse() {
+  public static ApiResponse<Void> success() {
     return createResponse(true, null);
   }
 
@@ -39,7 +39,7 @@ public class ApiResponseBuilder {
    * @param content response content
    * @param <T>     Type of the response content
    */
-  public static <T> ApiResponse<T> buildSuccessApiResponse(T content) {
+  public static <T> ApiResponse<T> success(T content) {
     return createResponse(true, content);
   }
 
@@ -49,9 +49,9 @@ public class ApiResponseBuilder {
    * @param status  HTTP Status that identifies the error
    * @param message Cause of the error
    */
-  public static ApiResponse<ErrorApiResponseBody> buildErrorApiResponse(HttpStatus status,
-                                                                        String message) {
-    return buildErrorApiResponse(status, message, null);
+  public static ApiResponse<ErrorApiResponseBody> error(HttpStatus status,
+                                                        String message) {
+    return error(status, message, null);
   }
 
   /**
@@ -61,34 +61,12 @@ public class ApiResponseBuilder {
    * @param message   Cause of the error
    * @param exception Exception that caused the error
    */
-  public static ApiResponse<ErrorApiResponseBody> buildErrorApiResponse(HttpStatus status,
-                                                                        String message,
-                                                                        Exception exception) {
+  public static ApiResponse<ErrorApiResponseBody> error(HttpStatus status,
+                                                        String message,
+                                                        Exception exception) {
     ErrorApiResponseBody body = generateErrorResponseBody(status, message, exception);
 
     return createResponse(false, body);
-  }
-  // endregion Error responses
-
-  private static <E extends Exception> ErrorApiResponseBody generateErrorResponseBody(
-      HttpStatus status, String message, E exception) {
-    return generateErrorResponseBody(status, message, exception, null);
-  }
-
-  private static <E extends Exception> ErrorApiResponseBody generateErrorResponseBody(
-      HttpStatus status, String message, E exception,
-      List<? extends ApiErrorDetails> errorDetailsList) {
-    String debugMessage = (exception != null) ? exception.getLocalizedMessage() : null;
-    boolean hasErrors = (errorDetailsList != null) && (!errorDetailsList.isEmpty());
-    List<? extends ApiErrorDetails> errorDetails = hasErrors ? errorDetailsList : null;
-
-    return ErrorApiResponseBody.builder()
-        .status(status.name())
-        .statusCode(status.value())
-        .message(message)
-        .debugMessage(debugMessage)
-        .errors(errorDetails)
-        .build();
   }
 
   /**
@@ -100,14 +78,39 @@ public class ApiResponseBuilder {
    * @param exception    Exception that caused the error
    * @param errorDetails List of details that explain the cause of the error response
    */
-  public static ApiResponse<ErrorApiResponseBody> buildErrorApiResponse(HttpStatus status,
-                                                                        String message,
-                                                                        Exception exception,
-                                                                        List<? extends ApiErrorDetails> errorDetails) {
+  public static ApiResponse<ErrorApiResponseBody> error(HttpStatus status,
+                                                        String message,
+                                                        Exception exception,
+                                                        List<? extends ApiErrorDetails> errorDetails) {
     ErrorApiResponseBody body = generateErrorResponseBody(status, message, exception, errorDetails);
 
     return createResponse(false, body);
   }
+  // endregion Error responses
+
+  // region Auxiliar methods
+
+  private static <E extends Exception> ErrorApiResponseBody generateErrorResponseBody(
+      HttpStatus status, String message, E exception) {
+    return generateErrorResponseBody(status, message, exception, null);
+  }
+
+  private static <E extends Exception> ErrorApiResponseBody generateErrorResponseBody(
+      HttpStatus status, String message, E exception, List<? extends ApiErrorDetails> errors) {
+    boolean hasErrors = (errors != null) && (!errors.isEmpty());
+    String debugMessage =
+        (exception != null && !hasErrors) ? exception.getLocalizedMessage() : null;
+    List<? extends ApiErrorDetails> errorDetails = hasErrors ? errors : null;
+
+    return ErrorApiResponseBody.builder()
+        .status(status.name())
+        .statusCode(status.value())
+        .message(message)
+        .debugMessage(debugMessage)
+        .errors(errorDetails)
+        .build();
+  }
+
 
   // endregion Auxiliar methods
 }

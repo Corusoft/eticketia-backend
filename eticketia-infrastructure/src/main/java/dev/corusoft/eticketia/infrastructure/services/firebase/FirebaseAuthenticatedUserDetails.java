@@ -1,4 +1,4 @@
-package dev.corusoft.eticketia.infrastructure.external.firebase;
+package dev.corusoft.eticketia.infrastructure.services.firebase;
 
 import com.google.firebase.auth.FirebaseToken;
 import java.util.Collection;
@@ -14,7 +14,7 @@ public class FirebaseAuthenticatedUserDetails implements UserDetails {
   private String name;
   private String email;
   private String picture;
-  private Map<String, Object> claims;
+  private transient Map<String, Object> claims;
 
   public FirebaseAuthenticatedUserDetails(FirebaseToken token) {
     this.uid = token.getUid();

@@ -13,7 +13,6 @@
     <artifactId>eticketia-backend-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>Eticketia Parent</name>
     <description>Parent module with dependencies and common project configuration</description>
     <inceptionYear>2025</inceptionYear>
     
@@ -63,7 +62,6 @@
         <spring-boot-starter-web>${spring-boot-starter}</spring-boot-starter-web>
         <spring-boot-testcontainers>${spring-boot-starter}</spring-boot-testcontainers>
         <spring-security-test>6.4.4</spring-security-test>
-        <lombok>1.18.38</lombok>
         <jacoco>0.8.13</jacoco>
         <testng>7.10.0</testng>
         <checkstyle>10.25.0</checkstyle>
@@ -95,7 +93,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok}</version>
+            <version>${lombok.version}</version>
             <scope>compile</scope>
         </dependency>
         
@@ -145,6 +143,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot-starter-web}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot-starter-data-jpa}</version>
         </dependency>
         
         <!-- Serialization -->
@@ -287,14 +290,11 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgs>
-                        <arg>-proc:full</arg>
-                    </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok}</version>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

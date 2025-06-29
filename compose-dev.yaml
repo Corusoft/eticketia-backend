@@ -1,0 +1,23 @@
+name: Eticketia-server-dev-stack
+
+networks:
+  postgres-server-dev-network:
+    driver: bridge
+
+volumes:
+  postgres-server-dev-volume:
+    driver: local
+
+services:
+  eticketa-server-dev-db:
+    image: 'postgres:17-alpine'
+    container_name: 'Eticketia-server-dev-database'
+    env_file:
+      - path: .docker.dev.env
+        required: true
+    networks:
+      - postgres-server-dev-network
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./eticketia-domain/src/main/sql/users-schema.sql:/docker-entrypoint-initdb.d/01-user-schema.sql

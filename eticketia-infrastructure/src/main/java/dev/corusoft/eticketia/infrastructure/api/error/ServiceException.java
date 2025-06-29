@@ -1,22 +1,19 @@
 package dev.corusoft.eticketia.infrastructure.api.error;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Represents a general exception.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ServiceException extends ApiErrorDetails {
+@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+public class ServiceException extends RuntimeException {
 
   /**
    * Build the exception from the original exception.
    */
   public ServiceException(Exception ex) {
-    this(ex.getLocalizedMessage());
+    super(ex);
   }
 
   /**
@@ -26,4 +23,10 @@ public class ServiceException extends ApiErrorDetails {
     super(reason);
   }
 
+  /**
+   * Build the exception explaining the cause and the original exception.
+   */
+  public ServiceException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

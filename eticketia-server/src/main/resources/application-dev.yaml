@@ -1,7 +1,9 @@
 spring:
   docker:
     compose:
-      enabled: false
+      enabled: true
+      file: 'compose-dev.yaml'
+      lifecycle-management: start_and_stop
 
 logging:
   config: 'classpath:log4j2-dev.xml'

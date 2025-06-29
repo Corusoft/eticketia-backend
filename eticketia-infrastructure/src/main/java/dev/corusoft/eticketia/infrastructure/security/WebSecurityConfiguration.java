@@ -39,9 +39,9 @@ public class WebSecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    configureFilters(http);
     configureCsrf(http);
     configureSessions(http);
-    configureFilters(http);
 
     // Apply the security rules configured by each REST controller
     secureEndpoints(http);

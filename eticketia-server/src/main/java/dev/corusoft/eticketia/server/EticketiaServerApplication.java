@@ -3,14 +3,14 @@ package dev.corusoft.eticketia.server;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Application entry point.
  */
-@SpringBootApplication(
-    scanBasePackages = "dev.corusoft.eticketia"
-)
 @Log4j2
+@ComponentScan(basePackages = {"dev.corusoft.eticketia"})
+@SpringBootApplication
 public class EticketiaServerApplication {
 
   /**
