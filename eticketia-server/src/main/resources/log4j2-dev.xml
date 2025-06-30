@@ -40,7 +40,7 @@
         </Root>
         
         <Logger level="ERROR" name="org.hibernate"/>
-        <Logger level="WARN" name="org.springframework"/>
+        <Logger level="INFO" name="org.springframework"/>
         
         <Logger level="DEBUG" name="dev.corusoft.eticketia.application"/>
         <Logger level="DEBUG" name="dev.corusoft.eticketia.domain"/>

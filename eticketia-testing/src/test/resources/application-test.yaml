@@ -1,11 +1,10 @@
+logging:
+  config: 'classpath:log4j2-test.xml'
+
 spring:
   docker:
     compose:
-      enabled: false
-      file: 'compose.test.yaml'
-      lifecycle-management: start_and_stop
-      skip:
-        in-tests: false
+      file: compose-test.yaml
 
 eticketia:
   banner:

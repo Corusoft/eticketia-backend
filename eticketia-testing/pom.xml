@@ -191,7 +191,13 @@
     <profiles>
         <profile>
             <id>testing</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
+                <!-- Read configuration from application-test.yaml -->
+                <activatedProperties>test</activatedProperties>
+                <maven.test.skip>false</maven.test.skip>
                 <mockito-core-dependency-absolute-path>
                     ${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
                 </mockito-core-dependency-absolute-path>
@@ -235,6 +241,9 @@
                             </dependency>
                         </dependencies>
                         <configuration>
+                            <systemPropertyVariables>
+                                <compose.file.path>${project.basedir}/compose-test.yaml</compose.file.path>
+                            </systemPropertyVariables>
                             <skipTests>false</skipTests>
                             <argLine>@{argLine} ${java-agents}</argLine>
                             <suiteXmlFiles>

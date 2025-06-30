@@ -1,13 +1,15 @@
-spring:
-  docker:
-    compose:
-      enabled: true
-      file: 'compose-dev.yaml'
-      lifecycle-management: start_and_stop
-
 logging:
   config: 'classpath:log4j2-dev.xml'
 
 eticketia:
   banner:
     buildName: '[@activatedProperties@ mode] @artifactId@_@project.version@'
+
+server:
+  servlet:
+    context-path: '/api'
+
+spring:
+  docker:
+    compose:
+      file: 'eticketia-infrastructure/compose-dev.yaml'
