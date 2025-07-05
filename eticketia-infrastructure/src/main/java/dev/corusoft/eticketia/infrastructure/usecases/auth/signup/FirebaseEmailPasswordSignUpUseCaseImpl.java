@@ -54,14 +54,19 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
     try {
       createdUser = doAssignRoles(createdUser);
       log.debug("Registered new user '{}'", createdUser.getDisplayName());
-    } catch (DomainException de) {
+    } catch (DomainException e) {
       try {
         firebaseAuth.deleteUser(createdUser.getUid());
-      } catch (FirebaseAuthException fe) {
-        DomainException ex = firebaseExceptionHandler.toDomainException(fe, input);
+        log.debug(
+            "Deleted user {} because of failure assigning roles",
+            createdUser.getDisplayName()
+        );
+      } catch (FirebaseAuthException firebaseException) {
+        DomainException ex = firebaseExceptionHandler.toDomainException(firebaseException, input);
         log.error("Error deleting new user '{}'", input.nickname(), ex);
-        throw ex;
       }
+
+      throw e;
     }
 
     return buildOutput(createdUser);
@@ -93,7 +98,7 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
 
   // region auxiliar methods
 
-  private UserRecord doCreateUser(EmailPasswordSignUpInput input) throws DomainException {
+  public UserRecord doCreateUser(EmailPasswordSignUpInput input) throws DomainException {
     CreateRequest createRequest = new CreateRequest()
         .setEmail(input.email())
         .setPassword(input.password())
@@ -103,12 +108,12 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
       return firebaseAuth.createUser(createRequest);
     } catch (FirebaseAuthException e) {
       DomainException ex = firebaseExceptionHandler.toDomainException(e, input);
-      log.error("Error creating new user: {}", input.nickname(), ex);
+      log.warn("Error creating new user: {}", input.nickname(), ex);
       throw ex;
     }
   }
 
-  private UserRecord doAssignRoles(UserRecord user) throws DomainException {
+  public UserRecord doAssignRoles(UserRecord user) throws DomainException {
     Map<String, Object> customClaims = buildNewUserClaims();
     UpdateRequest updateRequest = new UpdateRequest(user.getUid())
         .setCustomClaims(customClaims);
@@ -117,12 +122,12 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
       return firebaseAuth.updateUser(updateRequest);
     } catch (FirebaseAuthException e) {
       DomainException ex = firebaseExceptionHandler.toDomainException(e);
-      log.error("Error assigning default role for user '{}'", user.getDisplayName(), ex);
+      log.warn("Error assigning default role for user '{}'", user.getDisplayName());
       throw ex;
     }
   }
 
-  private static Map<String, Object> buildNewUserClaims() {
+  public static Map<String, Object> buildNewUserClaims() {
     Map<String, Object> customClaims = new TreeMap<>();
     customClaims.put(USER_ROLES_CLAIM, DEFAULT_NEW_USER_ROLE.getName());
 

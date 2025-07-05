@@ -10,12 +10,15 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 /**
  * Mapper that associates exceptions thrown by Firebase to the domain exceptions.
  */
+@Log4j2
 @RequiredArgsConstructor
 @Component
 public class FirebaseExceptionHandler {
@@ -55,10 +58,25 @@ public class FirebaseExceptionHandler {
 
     return Optional
         .ofNullable(cachedHandlers.get(errorCode))
-        .map(handler -> handler.handleException(exception, args))
+        .map(doHandleException(exception, args))
         .orElseThrow(
-            () -> new RuntimeException("No handler registered for Firebase exception", exception)
+            () -> {
+              String message = "No handler registered for Firebase exception " + errorCode;
+              log.error(message);
+
+              throw new RuntimeException(message, exception);
+            }
         );
+  }
+
+  private static Function<FirebaseAuthExceptionHandler, DomainException> doHandleException(
+      FirebaseAuthException exception, Object args) {
+    log.debug("Handling exception of type '{}'", exception.getAuthErrorCode());
+    if (args == null) {
+      return handler -> handler.handleException(exception);
+    }
+
+    return handler -> handler.handleException(exception, args);
   }
 
 }

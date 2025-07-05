@@ -14,11 +14,12 @@ public class EmailAlreadyExistsFirebaseAuthHandler implements FirebaseAuthExcept
 
   @Override
   public DomainException handleException(FirebaseAuthException exception, Object context) {
-    if (context instanceof EmailPasswordSignUpInput input) {
-      return new EmailAlreadyRegisteredException(input.email());
+    if (context == null) {
+      return new EmailAlreadyRegisteredException("<<unknown email>>");
     }
 
-    return new EmailAlreadyRegisteredException("<<unknown email>>");
+    EmailPasswordSignUpInput input = (EmailPasswordSignUpInput) context;
+    return new EmailAlreadyRegisteredException(input.email());
   }
 
   @Override

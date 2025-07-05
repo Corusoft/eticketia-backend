@@ -1,5 +1,8 @@
 package dev.corusoft.eticketia.application.usecases.auth.signup;
 
+import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.MAX_PASSWORD_LENGTH;
+import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.MIN_PASSWORD_LENGTH;
+
 import dev.corusoft.eticketia.application.UseCaseInput;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +20,7 @@ public record EmailPasswordSignUpInput(
     @Email
     String email,
     @NotNull
-    @Size(min = 6)
+    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH)
     String password,
     @NotBlank
     String nickname

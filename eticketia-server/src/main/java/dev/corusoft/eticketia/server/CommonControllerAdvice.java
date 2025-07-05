@@ -10,6 +10,7 @@ import dev.corusoft.eticketia.infrastructure.api.error.ApiValidationErrorDetails
 import dev.corusoft.eticketia.infrastructure.api.error.ErrorApiResponseBody;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,34 +23,36 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * Controller to handle exceptions thrown by the JVM or Spring framework
  */
+@Log4j2
 @ControllerAdvice
 @RequiredArgsConstructor
 public class CommonControllerAdvice {
 
   private final Translator translator;
 
-
-  // region Java exception handlers
-
-  @ExceptionHandler({RuntimeException.class, NullPointerException.class})
+  /**
+   * Default exception handler to manage uncaught exceptions on runtime.
+   *
+   * @param ex Exception that is not managed by another {@link ExceptionHandler}
+   */
+  @ExceptionHandler({RuntimeException.class, Exception.class})
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
-  public ApiResponse<ErrorApiResponseBody> handleRuntimeExceptions(Exception exception) {
-    String errorMessage = translator.generateMessage(exception.getClass().getName());
+  public ApiResponse<ErrorApiResponseBody> handleUnexpectedExceptions(Exception ex) {
+    log.error("An uncaught exception was thrown on runtime: {}", ex.getMessage(), ex);
 
-    return ApiResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, exception);
+    String errorMessage = translator.generateMessage(Exception.class.getName());
+
+    return ApiResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, ex);
   }
-
-  // endregion Java exception handlers
-
-
-  // region Spring exception handlers
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public ApiResponse<ErrorApiResponseBody> handleMethodArgumentNotValid(
       MethodArgumentNotValidException ex) {
+    logError(ex);
+
     List<ApiValidationErrorDetails> errorsList = ex.getBindingResult()
         .getFieldErrors()
         .stream()
@@ -60,14 +63,25 @@ public class CommonControllerAdvice {
     return error(HttpStatus.BAD_REQUEST, errorMessage, ex, errorsList);
   }
 
+
+  // region Spring exception handlers
+
+  private void logError(Exception ex) {
+    log.error(
+        "A {} exception was thrown: {}",
+        ex.getClass().getSimpleName(), ex.getMessage(), ex
+    );
+  }
+
   @ExceptionHandler(MissingServletRequestParameterException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public ApiResponse<ErrorApiResponseBody> handleMissingServletRequestParameterException(
-      MissingServletRequestParameterException exception) {
-    Object[] args = {exception.getParameterName(), exception.getParameterType()};
-    String errorMessage =
-        translator.generateMessage(exception.getClass().getName(), args);
+      MissingServletRequestParameterException ex) {
+    logError(ex);
+
+    Object[] args = {ex.getParameterName(), ex.getParameterType()};
+    String errorMessage = translator.generateMessage(ex.getClass().getName(), args);
 
     return ApiResponseBuilder.error(HttpStatus.BAD_REQUEST, errorMessage);
   }
@@ -76,8 +90,10 @@ public class CommonControllerAdvice {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public ApiResponse<ErrorApiResponseBody> handleHttpMessageNotReadableException(
-      HttpMessageNotReadableException exception) {
-    String errorMessage = translator.generateMessage(exception.getClass().getName());
+      HttpMessageNotReadableException ex) {
+    logError(ex);
+
+    String errorMessage = translator.generateMessage(ex.getClass().getName());
 
     return ApiResponseBuilder.error(HttpStatus.BAD_REQUEST, errorMessage);
   }
@@ -89,10 +105,12 @@ public class CommonControllerAdvice {
   @ExceptionHandler(FirebaseAuthException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
-  public ApiResponse<ErrorApiResponseBody> handleFirebaseAuthException(FirebaseAuthException e) {
-    String errorMessage = translator.generateMessage(e.getClass().getName());
+  public ApiResponse<ErrorApiResponseBody> handleFirebaseAuthException(FirebaseAuthException ex) {
+    logError(ex);
 
-    return ApiResponseBuilder.error(HttpStatus.BAD_REQUEST, errorMessage, e);
+    String errorMessage = translator.generateMessage(ex.getClass().getName());
+
+    return ApiResponseBuilder.error(HttpStatus.BAD_REQUEST, errorMessage, ex);
   }
 
   // endregion Firebase exception handlers
