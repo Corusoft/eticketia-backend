@@ -15,8 +15,8 @@ import org.mockito.ArgumentCaptor;
 /**
  * Utility class to make assertions over the arguments passed to tests.
  */
-@Log4j2
 @RequiredArgsConstructor(access = PRIVATE)
+@Log4j2
 public final class TestInputAssertionUtils {
 
   /**

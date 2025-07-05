@@ -1,5 +1,6 @@
 package dev.corusoft.eticketia.infrastructure.usecases.auth.signup;
 
+import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.DEFAULT_NEW_USER_ROLE;
 import static dev.corusoft.eticketia.infrastructure.security.SecurityConstants.USER_ROLES_CLAIM;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,12 +28,11 @@ import org.springframework.stereotype.Service;
 /**
  * Implementation of {@link EmailPasswordSignUpUseCase} using Firebase Authentication.
  */
-@Log4j2
-@RequiredArgsConstructor
-@Lazy
 @Service
+@Lazy
+@RequiredArgsConstructor
+@Log4j2
 public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswordSignUpUseCase {
-  private static final RoleName DEFAULT_NEW_USER_ROLE = RoleName.BASIC;
   private final FirebaseAuth firebaseAuth;
   private final FirebaseExceptionHandler firebaseExceptionHandler;
 

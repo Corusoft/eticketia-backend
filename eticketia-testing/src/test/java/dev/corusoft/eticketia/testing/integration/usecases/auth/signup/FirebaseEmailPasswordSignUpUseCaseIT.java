@@ -2,14 +2,25 @@ package dev.corusoft.eticketia.testing.integration.usecases.auth.signup;
 
 import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.MAX_PASSWORD_LENGTH;
 import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.MIN_PASSWORD_LENGTH;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockCreateUser;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockCreateUserWithException;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockDeleteUserWithException;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockFirebaseAuth;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockUpdateUser;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockUpdateUserWithException;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMockDataFactory.createFirebaseAuthException;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMockDataFactory.createMockedUserRecord;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.verify;
 
+import com.google.firebase.auth.AuthErrorCode;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
+import com.google.firebase.auth.UserRecord.UpdateRequest;
 import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpInput;
 import dev.corusoft.eticketia.application.usecases.auth.signup.UserSignUpOutput;
 import dev.corusoft.eticketia.domain.exceptions.auth.EmailAlreadyRegisteredException;
@@ -22,12 +33,10 @@ import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.UserAlre
 import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.UserNotFoundFirebaseAuthHandler;
 import dev.corusoft.eticketia.infrastructure.usecases.auth.signup.FirebaseEmailPasswordSignUpUseCaseImpl;
 import dev.corusoft.eticketia.testing.integration.BaseIT;
-import dev.corusoft.eticketia.testing.integration.mocks.auth.signup.FirebaseEmailPasswordSignUpUseCaseMock;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
-import org.mockito.ArgumentCaptor;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -39,27 +48,38 @@ public class FirebaseEmailPasswordSignUpUseCaseIT extends BaseIT {
   private FirebaseExceptionHandler exceptionHandler;
   private FirebaseEmailPasswordSignUpUseCaseImpl useCase;
   private FirebaseAuth mockedFirebaseAuth;
+
+  private String uid;
+  private String email;
+  private String password;
+  private String nickname;
+  private EmailPasswordSignUpInput useCaseInput;
+
   // endregion test variables
-
-  // region Mocked services
-  private FirebaseEmailPasswordSignUpUseCaseMock mockedUseCase;
-  // endregion Mocked services
-
 
   // region Tests lifecycle
 
   @BeforeMethod
   void setupMocks() {
     // Mock the use case execution and replace it
-    mockedUseCase = new FirebaseEmailPasswordSignUpUseCaseMock();
-    mockedFirebaseAuth = mockedUseCase.getFirebaseAuthMock();
+    mockedFirebaseAuth = mockFirebaseAuth();
     exceptionHandler = new FirebaseExceptionHandler(Collections.emptyList());
     useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(mockedFirebaseAuth, exceptionHandler);
   }
 
+  @BeforeMethod(dependsOnMethods = "setupMocks")
+  void generateData() {
+    this.uid = faker.internet().uuid();
+    this.nickname = faker.name().username();
+    this.email = faker.internet().safeEmailAddress(nickname);
+    this.password = faker.internet().password(
+        MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, true, true, true
+    );
+    this.useCaseInput = new EmailPasswordSignUpInput(email, password, nickname);
+  }
+
   @AfterMethod
   void resetMocks() {
-    mockedUseCase = null;
     useCase = null;
     exceptionHandler = new FirebaseExceptionHandler(Collections.emptyList());
   }
@@ -79,18 +99,12 @@ public class FirebaseEmailPasswordSignUpUseCaseIT extends BaseIT {
   @Test(
       description = "Use case executes without errors"
   )
-  void execute_signUpUseCase() throws Exception {
+  void when_signUp_then_success() throws Exception {
     // Arrange
-    String uid = faker.internet().uuid();
-    String nickname = faker.name().username();
-    String email = faker.internet().safeEmailAddress(nickname);
-    String password = faker.internet().password(
-        MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, true, true, true
-    );
-    EmailPasswordSignUpInput useCaseInput = new EmailPasswordSignUpInput(email, password, nickname);
-
-    // Configure mock for test
-    this.mockedUseCase.mockEmailPasswordSignUpSuccess(uid, useCaseInput);
+    UserRecord createUserMock = createMockedUserRecord(uid, null, null);
+    UserRecord updatedUserMock = createMockedUserRecord(uid, email, nickname);
+    mockCreateUser(mockedFirebaseAuth, createUserMock);
+    mockUpdateUser(mockedFirebaseAuth, updatedUserMock);
 
     // Act
     UserSignUpOutput output = useCase.execute(useCaseInput);
@@ -103,136 +117,89 @@ public class FirebaseEmailPasswordSignUpUseCaseIT extends BaseIT {
     assertThat(output.signedUpUser().getRegistrationDate()).isBeforeOrEqualTo(LocalDateTime.now());
     assertThat(output.signedUpUser().getLastUpdate()).isBeforeOrEqualTo(LocalDateTime.now());
 
-    // Verify mock was used with the arranged values
-    ArgumentCaptor<CreateRequest> captor = ArgumentCaptor.forClass(CreateRequest.class);
-    verify(mockedUseCase.getFirebaseAuthMock(), atMostOnce()).createUser(captor.capture());
+    // Verify mocks were used
+    verify(mockedFirebaseAuth, atMostOnce()).createUser(any(CreateRequest.class));
+    verify(mockedFirebaseAuth, atMostOnce()).updateUser(any(UpdateRequest.class));
   }
 
   @Test(
       description = "Use case throws EmailAlreadyRegisteredException"
   )
-  void execute_signUpUseCase_when_emailIsAlreadyRegistered() throws Exception {
-    // Configure mock for test
-    this.mockedUseCase.mockThrowEmailAlreadyRegisteredException();
+  void when_signUp_but_emailsIsAlreadyRegistered_then_fail() throws Exception {
+    // Arrange
     FirebaseAuthExceptionHandler existsEmailHandler = new EmailAlreadyExistsFirebaseAuthHandler();
-    var customExceptionHandler = new FirebaseExceptionHandler(List.of(existsEmailHandler));
-    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(
-        mockedFirebaseAuth, customExceptionHandler
-    );
-    customExceptionHandler.cacheExceptionHandlers();
-
-    // Arrange
-    String nickname = faker.name().username();
-    String email = faker.internet().safeEmailAddress(nickname);
-    String password = faker.internet().password(
-        MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, true, true, true
-    );
-    EmailPasswordSignUpInput useCaseInput = new EmailPasswordSignUpInput(email, password, nickname);
+    var exceptionsHandler = new FirebaseExceptionHandler(List.of(existsEmailHandler));
+    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(mockedFirebaseAuth, exceptionsHandler);
+    var mockedException = createFirebaseAuthException(AuthErrorCode.EMAIL_ALREADY_EXISTS);
+    mockCreateUserWithException(mockedFirebaseAuth, mockedException);
 
     // Act
-    assertThatThrownBy(
-        () -> useCase.execute(useCaseInput)
-    ).isInstanceOf(EmailAlreadyRegisteredException.class);
+    assertThatThrownBy(() -> useCase.execute(useCaseInput))
+        .isInstanceOf(EmailAlreadyRegisteredException.class);
 
     // Verify mock was used
-    verify(mockedUseCase.getFirebaseAuthMock(), atMostOnce()).createUser(any(CreateRequest.class));
+    verify(mockedFirebaseAuth, atMostOnce()).createUser(any(CreateRequest.class));
   }
 
   @Test(
       description = "Use case throws UserAlreadyExistsException"
   )
-  void execute_signUpUseCase_when_userAlreadyExists() throws Exception {
+  void when_signUp_but_userAlreadyExists_then_fail() throws Exception {
     // Arrange
-    String uid = faker.internet().uuid();
-    String nickname = faker.name().username();
-    String email = faker.internet().safeEmailAddress(nickname);
-    String password = faker.internet().password(
-        MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, true, true, true
-    );
-    EmailPasswordSignUpInput useCaseInput = new EmailPasswordSignUpInput(email, password, nickname);
-
-    // Configure mock for test
-    this.mockedUseCase.mockThrowUserAlreadyExistException(uid, nickname);
-    FirebaseAuthExceptionHandler authExceptionHandler = new UserAlreadyExistsFirebaseAuthHandler();
-    FirebaseExceptionHandler firebaseExceptionHandler =
-        new FirebaseExceptionHandler(List.of(authExceptionHandler));
-    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(
-        mockedFirebaseAuth, firebaseExceptionHandler
-    );
-    firebaseExceptionHandler.cacheExceptionHandlers();
-
+    FirebaseAuthExceptionHandler existsUserHandler = new UserAlreadyExistsFirebaseAuthHandler();
+    var exceptionsHandler = new FirebaseExceptionHandler(List.of(existsUserHandler));
+    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(mockedFirebaseAuth, exceptionsHandler);
+    var mockedException = createFirebaseAuthException(AuthErrorCode.UID_ALREADY_EXISTS);
+    mockCreateUserWithException(mockedFirebaseAuth, mockedException);
 
     // Act
-    assertThatThrownBy(
-        () -> useCase.execute(useCaseInput)
-    ).isInstanceOf(UserAlreadyExistsException.class);
+    assertThatThrownBy(() -> useCase.execute(useCaseInput))
+        .isInstanceOf(UserAlreadyExistsException.class);
 
     // Verify mock was used
-    verify(mockedUseCase.getFirebaseAuthMock(), atMostOnce()).createUser(any(CreateRequest.class));
+    verify(mockedFirebaseAuth, atMostOnce()).createUser(any(CreateRequest.class));
   }
 
   @Test(
-      description = "Use case throws UserAlreadyExistsException"
+      description = "Use case throws UserNotFoundException"
   )
-  void execute_signUpUseCase_when_assigningRoles_then_userNotFound() throws Exception {
+  void when_signUp_but_cannotAssignRoles_then_fail() throws Exception {
     // Arrange
-    String uid = faker.internet().uuid();
-    String nickname = faker.name().username();
-    String email = faker.internet().safeEmailAddress(nickname);
-    String password = faker.internet().password(
-        MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, true, true, true
-    );
-    EmailPasswordSignUpInput useCaseInput = new EmailPasswordSignUpInput(email, password, nickname);
-
-    // Configure mock for test
-    this.mockedUseCase.mockThrowUserNotFoundException(uid, nickname);
-    FirebaseAuthExceptionHandler authExceptionHandler = new UserNotFoundFirebaseAuthHandler();
-    FirebaseExceptionHandler firebaseExceptionHandler =
-        new FirebaseExceptionHandler(List.of(authExceptionHandler));
-    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(
-        mockedFirebaseAuth, firebaseExceptionHandler
-    );
-    firebaseExceptionHandler.cacheExceptionHandlers();
+    FirebaseAuthExceptionHandler userNotFoundHandler = new UserNotFoundFirebaseAuthHandler();
+    var exceptionsHandler = new FirebaseExceptionHandler(List.of(userNotFoundHandler));
+    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(mockedFirebaseAuth, exceptionsHandler);
+    var mockedException = createFirebaseAuthException(AuthErrorCode.USER_NOT_FOUND);
+    mockCreateUser(mockedFirebaseAuth, createMockedUserRecord(uid, null, null));
+    mockUpdateUserWithException(mockedFirebaseAuth, mockedException);
 
     // Act
-    assertThatThrownBy(
-        () -> useCase.execute(useCaseInput)
-    ).isInstanceOf(UserNotFoundException.class);
+    assertThatThrownBy(() -> useCase.execute(useCaseInput))
+        .isInstanceOf(UserNotFoundException.class);
 
     // Verify mock was used
-    verify(mockedUseCase.getFirebaseAuthMock(), atMostOnce()).createUser(any(CreateRequest.class));
+    verify(mockedFirebaseAuth, atMostOnce()).createUser(any(CreateRequest.class));
   }
 
   @Test(
       description = "Use case cannot delete user on failure"
   )
-  void when_signUpUseCase_failsDeletingUser_then_throwException() throws Exception {
+  void when_signUp_failsDeletingUser_then_throwException() throws Exception {
     // Arrange
-    String uid = faker.internet().uuid();
-    String nickname = faker.name().username();
-    String email = faker.internet().safeEmailAddress(nickname);
-    String password = faker.internet().password(
-        MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, true, true, true
-    );
-    EmailPasswordSignUpInput useCaseInput = new EmailPasswordSignUpInput(email, password, nickname);
-
-    // Configure mock for test
-    this.mockedUseCase.mockThrowExceptionWhenDeleteUser(uid, nickname);
-    FirebaseAuthExceptionHandler authExceptionHandler = new UserNotFoundFirebaseAuthHandler();
-    FirebaseExceptionHandler firebaseExceptionHandler =
-        new FirebaseExceptionHandler(List.of(authExceptionHandler));
-    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(
-        mockedFirebaseAuth, firebaseExceptionHandler
-    );
-    firebaseExceptionHandler.cacheExceptionHandlers();
+    FirebaseAuthExceptionHandler userNotFoundHandler = new UserNotFoundFirebaseAuthHandler();
+    var exceptionsHandler = new FirebaseExceptionHandler(List.of(userNotFoundHandler));
+    useCase = new FirebaseEmailPasswordSignUpUseCaseImpl(mockedFirebaseAuth, exceptionsHandler);
+    var mockedException = createFirebaseAuthException(AuthErrorCode.USER_NOT_FOUND);
+    UserRecord mockedCreatedUser = createMockedUserRecord(uid, null, null);
+    mockCreateUser(mockedFirebaseAuth, mockedCreatedUser);
+    mockUpdateUserWithException(mockedFirebaseAuth, mockedException);
+    mockDeleteUserWithException(mockedFirebaseAuth, mockedException);
 
     // Act
-    assertThatThrownBy(
-        () -> useCase.execute(useCaseInput)
-    ).isInstanceOf(UserNotFoundException.class);
+    assertThatThrownBy(() -> useCase.execute(useCaseInput))
+        .isInstanceOf(UserNotFoundException.class);
 
     // Verify mock was used
-    verify(mockedUseCase.getFirebaseAuthMock(), atMostOnce()).createUser(any(CreateRequest.class));
+    verify(mockedFirebaseAuth, atMostOnce()).createUser(any(CreateRequest.class));
   }
 
 

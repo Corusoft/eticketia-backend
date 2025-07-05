@@ -13,7 +13,7 @@ public class TimeUtils {
   /**
    * Return the current time in UTC milliseconds.
    */
-  public static long toUtcMillisecondsNow() {
+  public static long currentUtcMilliseconds() {
     return toUtcMilliseconds(LocalDateTime.now());
   }
 

@@ -11,6 +11,8 @@ import dev.corusoft.eticketia.infrastructure.api.error.ErrorApiResponseBody;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,9 +25,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * Controller to handle exceptions thrown by the JVM or Spring framework
  */
-@Log4j2
 @ControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 @RequiredArgsConstructor
+@Log4j2
 public class CommonControllerAdvice {
 
   private final Translator translator;
@@ -35,9 +38,9 @@ public class CommonControllerAdvice {
    *
    * @param ex Exception that is not managed by another {@link ExceptionHandler}
    */
-  @ExceptionHandler({RuntimeException.class, Exception.class})
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler({RuntimeException.class})
   public ApiResponse<ErrorApiResponseBody> handleUnexpectedExceptions(Exception ex) {
     log.error("An uncaught exception was thrown on runtime: {}", ex.getMessage(), ex);
 
@@ -46,9 +49,9 @@ public class CommonControllerAdvice {
     return ApiResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, ex);
   }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(MethodArgumentNotValidException.class)
   public ApiResponse<ErrorApiResponseBody> handleMethodArgumentNotValid(
       MethodArgumentNotValidException ex) {
     logError(ex);
@@ -73,9 +76,9 @@ public class CommonControllerAdvice {
     );
   }
 
-  @ExceptionHandler(MissingServletRequestParameterException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(MissingServletRequestParameterException.class)
   public ApiResponse<ErrorApiResponseBody> handleMissingServletRequestParameterException(
       MissingServletRequestParameterException ex) {
     logError(ex);
@@ -86,9 +89,9 @@ public class CommonControllerAdvice {
     return ApiResponseBuilder.error(HttpStatus.BAD_REQUEST, errorMessage);
   }
 
-  @ExceptionHandler(HttpMessageNotReadableException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(HttpMessageNotReadableException.class)
   public ApiResponse<ErrorApiResponseBody> handleHttpMessageNotReadableException(
       HttpMessageNotReadableException ex) {
     logError(ex);
@@ -102,9 +105,9 @@ public class CommonControllerAdvice {
 
   // region Firebase exception handlers
 
-  @ExceptionHandler(FirebaseAuthException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(FirebaseAuthException.class)
   public ApiResponse<ErrorApiResponseBody> handleFirebaseAuthException(FirebaseAuthException ex) {
     logError(ex);
 

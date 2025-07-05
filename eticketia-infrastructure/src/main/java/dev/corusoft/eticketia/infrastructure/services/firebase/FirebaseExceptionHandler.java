@@ -4,8 +4,8 @@ import com.google.firebase.auth.AuthErrorCode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import dev.corusoft.eticketia.domain.exceptions.DomainException;
+import dev.corusoft.eticketia.infrastructure.api.error.ServiceException;
 import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.FirebaseAuthExceptionHandler;
-import jakarta.annotation.PostConstruct;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -18,22 +18,14 @@ import org.springframework.stereotype.Component;
 /**
  * Mapper that associates exceptions thrown by Firebase to the domain exceptions.
  */
-@Log4j2
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
+@Log4j2
 public class FirebaseExceptionHandler {
   private final List<FirebaseAuthExceptionHandler> exceptionHandlers;
   private final Map<AuthErrorCode, FirebaseAuthExceptionHandler> cachedHandlers =
       new EnumMap<>(AuthErrorCode.class);
 
-  /**
-   * Cache handlers for fast lookups
-   */
-  @PostConstruct
-  public void cacheExceptionHandlers() {
-    exceptionHandlers
-        .forEach(handler -> cachedHandlers.put(handler.getHandledError(), handler));
-  }
 
   /**
    * Associates the exception with the corresponding domain exception.
@@ -57,25 +49,44 @@ public class FirebaseExceptionHandler {
     AuthErrorCode errorCode = exception.getAuthErrorCode();
 
     return Optional
-        .ofNullable(cachedHandlers.get(errorCode))
+        .ofNullable(getExceptionHandlerForError(errorCode))
         .map(doHandleException(exception, args))
         .orElseThrow(
             () -> {
               String message = "No handler registered for Firebase exception " + errorCode;
               log.error(message);
 
-              throw new RuntimeException(message, exception);
+              throw new ServiceException(message, exception);
             }
         );
   }
 
+  public FirebaseAuthExceptionHandler getExceptionHandlerForError(AuthErrorCode errorCode) {
+    Function<AuthErrorCode, FirebaseAuthExceptionHandler> doCacheHandler =
+        authErrorCode -> exceptionHandlers.stream()
+            .filter(handler -> handler.getHandledError().equals(authErrorCode))
+            .findFirst()
+            .orElseThrow(
+                () -> {
+                  String message = "No handler registered for Firebase exception " + authErrorCode;
+                  log.error(message);
+
+                  throw new ServiceException(message);
+                }
+            );
+
+    // Try to get the handler, or create it and cache it
+    return cachedHandlers.computeIfAbsent(errorCode, doCacheHandler);
+  }
+
   private static Function<FirebaseAuthExceptionHandler, DomainException> doHandleException(
       FirebaseAuthException exception, Object args) {
-    log.debug("Handling exception of type '{}'", exception.getAuthErrorCode());
     if (args == null) {
+      log.debug("Handling exception of type '{}' with no args", exception.getAuthErrorCode());
       return handler -> handler.handleException(exception);
     }
 
+    log.debug("Handling exception of type '{}' with args", exception.getAuthErrorCode());
     return handler -> handler.handleException(exception, args);
   }
 

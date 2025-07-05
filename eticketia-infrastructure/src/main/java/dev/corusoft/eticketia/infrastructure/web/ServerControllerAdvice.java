@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * Controller to handle all the customized exceptions created for the application
  */
-@Log4j2
 @ControllerAdvice(basePackages = {"dev.corusoft.eticketia.server.controllers"})
 @RequiredArgsConstructor
+@Log4j2
 public class ServerControllerAdvice {
   private final Translator translator;
 
-  @ExceptionHandler(DomainException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(DomainException.class)
   public ApiResponse<ErrorApiResponseBody> handleDomainException(DomainException ex) {
     logError(ex);
 
@@ -42,22 +42,21 @@ public class ServerControllerAdvice {
     );
   }
 
-  @ExceptionHandler(EmailAlreadyRegisteredException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ExceptionHandler(EmailAlreadyRegisteredException.class)
   public ApiResponse<ErrorApiResponseBody> handleEmailAlreadyRegisteredException(
       EmailAlreadyRegisteredException ex) {
     logError(ex);
 
     String errorMessage = translator.generateMessage(ex);
 
-    return ApiResponseBuilder.error(HttpStatus.BAD_REQUEST, errorMessage, ex);
+    return ApiResponseBuilder.error(HttpStatus.CONFLICT, errorMessage, ex);
   }
 
-  @ExceptionHandler(UserNotFoundException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
-
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(UserNotFoundException.class)
   public ApiResponse<ErrorApiResponseBody> handleUserNotFoundException(UserNotFoundException ex) {
     logError(ex);
 

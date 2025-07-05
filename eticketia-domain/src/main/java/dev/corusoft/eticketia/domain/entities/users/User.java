@@ -13,9 +13,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 public class User {
-  @EqualsAndHashCode.Include
   @Id
   @Column(name = "uid", nullable = false, unique = true)
+  @EqualsAndHashCode.Include
   private String uid;
 
   @Column(name = "email", nullable = false, unique = true)
@@ -34,8 +34,8 @@ public class User {
   private RoleName role;
 
 
-  @PrePersist
   @PreUpdate
+  @PrePersist
   protected void onUpdate() {
     this.lastUpdate = LocalDateTime.now();
   }

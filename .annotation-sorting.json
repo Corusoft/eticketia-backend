@@ -1,0 +1,31 @@
+{
+  "annotationOrder": [
+    "Override",
+    "Deprecated",
+    "SuppressWarnings",
+    "FunctionalInterface",
+    "SafeVarargs",
+    "org.springframework.stereotype.*",
+    "org.springframework.web.bind.annotation.*",
+    "org.springframework.beans.factory.annotation.*",
+    "org.springframework.context.annotation.*",
+    "org.springframework.*",
+    "org.springframework.boot.autoconfigure.*",
+    "org.springframework.boot.*",
+    "javax.validation.*",
+    "jakarta.validation.*",
+    "javax.persistence.*",
+    "jakarta.persistence.*",
+    "com.fasterxml.jackson.*",
+    "lombok.*",
+    "lombok.extern.*",
+    "org.junit.*",
+    "org.testng.*",
+    "org.springframework.test.*",
+    "org.springframework.*",
+    "java.lang.*",
+    "javax.*",
+    "jakarta.*"
+  ],
+  "unmatchedPosition": 26
+}
