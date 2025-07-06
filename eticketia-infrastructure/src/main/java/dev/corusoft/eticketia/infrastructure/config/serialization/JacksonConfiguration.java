@@ -9,12 +9,15 @@ import dev.corusoft.eticketia.infrastructure.config.serialization.serializers.Ja
 import dev.corusoft.eticketia.infrastructure.config.serialization.serializers.JacksonLocalDateTimeSerializer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class JacksonConfiguration {
 

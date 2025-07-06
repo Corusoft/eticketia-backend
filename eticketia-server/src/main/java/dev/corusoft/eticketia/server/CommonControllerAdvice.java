@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
-@RequiredArgsConstructor
 @Log4j2
+@RequiredArgsConstructor
 public class CommonControllerAdvice {
 
   private final Translator translator;

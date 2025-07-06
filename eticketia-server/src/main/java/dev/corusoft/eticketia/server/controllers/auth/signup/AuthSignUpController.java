@@ -29,8 +29,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping(AUTH_SIGNUP)
 @RestController
 @Lazy
-@RequiredArgsConstructor
 @Log4j2
+@RequiredArgsConstructor
 public class AuthSignUpController implements EndpointSecurityConfigurer {
   private final EmailPasswordSignUpUseCase signUpUseCase;
 

@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * Application entry point.
  */
-@ComponentScan(basePackages = {"dev.corusoft.eticketia"})
 @SpringBootApplication
+@ComponentScan(basePackages = {"dev.corusoft.eticketia"})
 @Log4j2
 public class EticketiaServerApplication {
 
