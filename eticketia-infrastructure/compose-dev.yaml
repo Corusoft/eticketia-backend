@@ -10,7 +10,7 @@ volumes:
 
 services:
   eticketa-dev-db:
-    image: 'postgres:17-alpine'
+    image: 'postgres:17.5-alpine'
     container_name: 'eticketia-dev-database'
     env_file:
       - path: .docker.dev.env
