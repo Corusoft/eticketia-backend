@@ -10,7 +10,7 @@
         <Property name="date">%d{ISO8601}</Property>
         <Property name="thread">[%t]</Property>
         <Property name="level">%-5level</Property>
-        <Property name="logger">%class{-3}.%method:%line</Property>
+        <Property name="logger">%class{-0}.%method:%line</Property>
         <Property name="message">%msg</Property>
         <Property name="logFormat">${thread} ${level} ${date} || ${logger} -- ${message} %n</Property>
     </Properties>
@@ -38,6 +38,9 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Root>
+        
+        <Logger level="ERROR" name="org.hibernate"/>
+        <Logger level="INFO" name="org.springframework"/>
         
         <Logger level="DEBUG" name="dev.corusoft.eticketia.application"/>
         <Logger level="DEBUG" name="dev.corusoft.eticketia.domain"/>

@@ -3,6 +3,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+/node_modules/
 
 ### STS ###
 .apt_generated
@@ -33,9 +34,11 @@ build/
 ### VS Code ###
 .vscode/
 
+### Credentials or API Keys ###
 *.env
 *.pem
+**/firebase-credentials.json
+
+### Logs ###
 logs
 test-output
-
-/node_modules/

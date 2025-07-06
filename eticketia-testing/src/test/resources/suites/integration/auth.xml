@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Auth integration testing suite" parallel="tests" thread-count="2" time-out="300000">
+    <test name="Auth">
+        <classes>
+            <class name="dev.corusoft.eticketia.testing.integration.usecases.auth.signup.FirebaseEmailPasswordSignUpUseCaseIT"/>
+        </classes>
+    </test>
+
+</suite>

@@ -1,0 +1,23 @@
+name: eticketia-test-stack
+
+networks:
+  postgres-test-network:
+    driver: bridge
+
+volumes:
+  postgres-test-volume:
+    driver: local
+
+services:
+  eticketa-test-db:
+    image: 'postgres:17.5-alpine'
+    container_name: 'eticketia-test-database'
+    env_file:
+      - path: .docker.test.env
+        required: true
+    networks:
+      - postgres-test-network
+    ports:
+      - "5431:5432"
+    volumes:
+      - ../eticketia-infrastructure/src/main/resources/sql/users-schema.sql:/docker-entrypoint-initdb.d/01-user-schema.sql

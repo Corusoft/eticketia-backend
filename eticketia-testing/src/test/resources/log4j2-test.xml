@@ -39,6 +39,9 @@
             <AppenderRef ref="RollingFile"/>
         </Root>
         
+        <Logger level="ERROR" name="org.hibernate"/>
+        <Logger level="INFO" name="org.springframework"/>
+        
         <Logger level="INFO" name="dev.corusoft.eticketia.application"/>
         <Logger level="INFO" name="dev.corusoft.eticketia.domain"/>
         <Logger level="INFO" name="dev.corusoft.eticketia.infrastructure"/>

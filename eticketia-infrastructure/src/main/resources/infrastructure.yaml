@@ -1,7 +1,0 @@
-server:
-  servlet:
-    context-path: '/api'
-
-spring:
-  messages:
-    cache-seconds: 43200    # 60 sec * 60 min * 12 hour

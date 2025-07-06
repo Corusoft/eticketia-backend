@@ -11,10 +11,9 @@ import lombok.Builder;
 public record ErrorApiResponseBody(
     int statusCode,
     String status,
-    String message,
+    @JsonInclude(NON_NULL) String message,
     @JsonInclude(NON_NULL) String debugMessage,
-    @JsonInclude(NON_NULL)
-    List<? extends ApiErrorDetails> errors
+    @JsonInclude(NON_NULL) List<? extends ApiErrorDetails> errors
 )
     implements ApiResponseBody {
 

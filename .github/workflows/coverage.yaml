@@ -8,6 +8,7 @@ on:
       - master
       - release
       - hotfix
+      - develop
       - staging
   pull_request:
     types: [ opened, synchronize, reopened ]
@@ -25,18 +26,22 @@ jobs:
       db-test:
         image: 'postgres:17.5-alpine'
         ports:
-          - 5432:5432
+          - 5431:5432
         env:
           POSTGRES_DB: testing
           POSTGRES_USER: myuser
           POSTGRES_PASSWORD: mypassword
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 5
 
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: 🐋 Cache Docker images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
 
       - name: ☕ Set up JDK 21
         uses: actions/setup-java@v4
