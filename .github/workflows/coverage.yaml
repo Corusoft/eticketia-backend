@@ -75,6 +75,7 @@ jobs:
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=Corusoft_eticketia-backend \
           -Dproject.settings=sonar-project.properties \
+          -Dsonar.tests=eticketia-testing/src/test/java \
           -Ptesting
 
       - name: 🧹 Clean environment
