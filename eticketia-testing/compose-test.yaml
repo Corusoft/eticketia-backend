@@ -9,7 +9,7 @@ volumes:
     driver: local
 
 services:
-  eticketa-test-db:
+  eticketia-test-db:
     image: 'postgres:17.5-alpine'
     container_name: 'eticketia-test-database'
     env_file:
@@ -21,3 +21,4 @@ services:
       - "5431:5432"
     volumes:
       - ../eticketia-infrastructure/src/main/resources/sql/users-schema.sql:/docker-entrypoint-initdb.d/01-user-schema.sql
+      - ../eticketia-infrastructure/src/main/resources/sql/tickets-schema.sql:/docker-entrypoint-initdb.d/02-tickets-schema.sql

@@ -66,6 +66,10 @@
         <testng>7.10.0</testng>
         <checkstyle>10.25.0</checkstyle>
         <bouncycastle>1.80</bouncycastle>
+        <jsonwebtoken-jjwt>0.12.6</jsonwebtoken-jjwt>
+        <firestore>3.26.5</firestore>
+        <firebase-admin>9.4.1</firebase-admin>
+        <mindee>4.32.1</mindee>
         
         <!-- Plugins -->
         <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
@@ -144,11 +148,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot-starter-web}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot-starter-data-jpa}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-jpa</artifactId>-->
+<!--            <version>${spring-boot-starter-data-jpa}</version>-->
+<!--        </dependency>-->
         
         <!-- Serialization -->
         <dependency>
@@ -170,6 +174,26 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.mindee.sdk</groupId>
+                <artifactId>mindee-api-java</artifactId>
+                <version>${mindee}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     
     <build>
         <finalName>${project.build.finalName}</finalName>

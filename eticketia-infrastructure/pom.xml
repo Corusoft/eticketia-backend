@@ -22,9 +22,6 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         
         <!-- Dependencies versioning -->
-        <jsonwebtoken-jjwt>0.12.6</jsonwebtoken-jjwt>
-        <postgres>42.7.7</postgres>
-        <firebase-admin.version>9.4.1</firebase-admin.version>
     </properties>
     
     <dependencies>
@@ -56,13 +53,6 @@
             <version>${jsonwebtoken-jjwt}</version>
         </dependency>
         
-        <!-- Drivers -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgres}</version>
-        </dependency>
-        
         <!-- Crypto -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -87,7 +77,7 @@
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>${firebase-admin.version}</version>
+            <version>${firebase-admin}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -95,6 +85,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-firestore</artifactId>
+            <version>${firestore}</version>
+        </dependency>
+
+        <!-- Mindee -->
+        <dependency>
+            <groupId>com.mindee.sdk</groupId>
+            <artifactId>mindee-api-java</artifactId>
+            <version>${mindee}</version>
+        </dependency>
+
     </dependencies>
     
     <build>

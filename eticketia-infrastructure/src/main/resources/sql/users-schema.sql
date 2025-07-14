@@ -1,7 +1,6 @@
 DROP SCHEMA IF EXISTS users CASCADE;
 CREATE SCHEMA users;
 
-
 CREATE TABLE IF NOT EXISTS users.UserTable (
     uid             VARCHAR,
     email           VARCHAR(100) NOT NULL,

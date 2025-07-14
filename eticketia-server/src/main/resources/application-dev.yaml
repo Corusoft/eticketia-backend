@@ -12,4 +12,9 @@ server:
 spring:
   docker:
     compose:
+      enabled: false
       file: 'eticketia-infrastructure/compose-dev.yaml'
+      stop:
+        command: down
+        timeout: 30s
+

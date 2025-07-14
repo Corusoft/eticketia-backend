@@ -23,6 +23,11 @@
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-firestore</artifactId>
+            <version>${firestore}</version>
+        </dependency>
     </dependencies>
     
     <build>
