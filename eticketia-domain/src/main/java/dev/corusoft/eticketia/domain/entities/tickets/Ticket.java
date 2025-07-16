@@ -2,6 +2,7 @@ package dev.corusoft.eticketia.domain.entities.tickets;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 import dev.corusoft.eticketia.domain.entities.tickets.enums.*;
+import dev.corusoft.eticketia.domain.repositories.Identifiable;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ import java.util.Locale;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ticket {
+public class Ticket implements Identifiable<Long> {
     // region Attributes
     @DocumentId
     private Long id;

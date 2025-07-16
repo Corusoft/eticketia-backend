@@ -11,7 +11,7 @@ public class UserConversor {
 
   public static UserResumeDTO toResumeUserDTO(User entity) {
     return new UserResumeDTO(
-        entity.getUid(),
+        entity.getId(),
         entity.getEmail(),
         entity.getDisplayName(),
         entity.getRegistrationDate()

@@ -1,29 +1,24 @@
 package dev.corusoft.eticketia.infrastructure.usecases.auth.signup;
 
-import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.DEFAULT_NEW_USER_ROLE;
-import static dev.corusoft.eticketia.infrastructure.security.SecurityConstants.USER_ROLES_CLAIM;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
+import com.google.firebase.auth.*;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.auth.UserRecord.UpdateRequest;
-import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpInput;
-import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpUseCase;
-import dev.corusoft.eticketia.application.usecases.auth.signup.UserSignUpOutput;
+import dev.corusoft.eticketia.application.usecases.auth.signup.*;
 import dev.corusoft.eticketia.domain.entities.roles.RoleName;
 import dev.corusoft.eticketia.domain.entities.users.User;
 import dev.corusoft.eticketia.domain.exceptions.DomainException;
 import dev.corusoft.eticketia.infrastructure.services.firebase.FirebaseExceptionHandler;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.time.*;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.DEFAULT_NEW_USER_ROLE;
+import static dev.corusoft.eticketia.infrastructure.security.SecurityConstants.USER_ROLES_CLAIM;
 
 /**
  * Implementation of {@link EmailPasswordSignUpUseCase} using Firebase Authentication.
@@ -85,7 +80,7 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
     RoleName role = (roleClaim != null) ? RoleName.valueOf(roleClaim) : DEFAULT_NEW_USER_ROLE;
 
     User user = User.builder()
-        .uid(userRecord.getUid())
+        .id(userRecord.getUid())
         .email(userRecord.getEmail())
         .displayName(userRecord.getDisplayName())
         .registrationDate(creationDate)

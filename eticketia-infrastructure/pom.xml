@@ -8,22 +8,22 @@
         <artifactId>eticketia-backend-parent</artifactId>
         <version>${revision}</version>
     </parent>
-    
+
     <artifactId>eticketia-infrastructure</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
     <description>Module for implementations, configuration, datasources and external resources</description>
     <inceptionYear>2025</inceptionYear>
-    
+
     <properties>
         <!-- Code coverage -->
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        
+
         <!-- Dependencies versioning -->
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>dev.corusoft.eticketia</groupId>
@@ -35,7 +35,7 @@
             <artifactId>eticketia-application</artifactId>
             <version>${revision}</version>
         </dependency>
-        
+
         <!-- Json Web Token -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -52,7 +52,7 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jsonwebtoken-jjwt}</version>
         </dependency>
-        
+
         <!-- Crypto -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -72,24 +72,6 @@
             <version>${bouncycastle}</version>
             <scope>runtime</scope>
         </dependency>
-        
-        <!-- Firebase -->
-        <dependency>
-            <groupId>com.google.firebase</groupId>
-            <artifactId>firebase-admin</artifactId>
-            <version>${firebase-admin}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-firestore</artifactId>
-            <version>${firestore}</version>
-        </dependency>
 
         <!-- Mindee -->
         <dependency>
@@ -99,10 +81,10 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>${project.build.finalName}</finalName>
-        
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

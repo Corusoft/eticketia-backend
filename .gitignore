@@ -37,7 +37,6 @@ build/
 ### Credentials or API Keys ###
 *.env
 *.pem
-**/firebase-credentials.json
 
 ### Logs ###
 logs

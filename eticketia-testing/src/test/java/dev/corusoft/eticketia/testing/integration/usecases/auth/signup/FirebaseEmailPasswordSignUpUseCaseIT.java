@@ -1,13 +1,25 @@
 package dev.corusoft.eticketia.testing.integration.usecases.auth.signup;
 
+import com.google.firebase.auth.*;
+import com.google.firebase.auth.UserRecord.CreateRequest;
+import com.google.firebase.auth.UserRecord.UpdateRequest;
+import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpInput;
+import dev.corusoft.eticketia.application.usecases.auth.signup.UserSignUpOutput;
+import dev.corusoft.eticketia.domain.exceptions.auth.*;
+import dev.corusoft.eticketia.infrastructure.services.firebase.FirebaseExceptionHandler;
+import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.*;
+import dev.corusoft.eticketia.infrastructure.usecases.auth.signup.FirebaseEmailPasswordSignUpUseCaseImpl;
+import dev.corusoft.eticketia.testing.integration.BaseIT;
+import lombok.extern.log4j.Log4j2;
+import org.testng.annotations.*;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+
 import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.MAX_PASSWORD_LENGTH;
 import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.MIN_PASSWORD_LENGTH;
-import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockCreateUser;
-import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockCreateUserWithException;
-import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockDeleteUserWithException;
-import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockFirebaseAuth;
-import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockUpdateUser;
-import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.mockUpdateUserWithException;
+import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMock.*;
 import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMockDataFactory.createFirebaseAuthException;
 import static dev.corusoft.eticketia.testing.integration.services.FirebaseAuthMockDataFactory.createMockedUserRecord;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,31 +27,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.verify;
-
-import com.google.firebase.auth.AuthErrorCode;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserRecord;
-import com.google.firebase.auth.UserRecord.CreateRequest;
-import com.google.firebase.auth.UserRecord.UpdateRequest;
-import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpInput;
-import dev.corusoft.eticketia.application.usecases.auth.signup.UserSignUpOutput;
-import dev.corusoft.eticketia.domain.exceptions.auth.EmailAlreadyRegisteredException;
-import dev.corusoft.eticketia.domain.exceptions.auth.UserAlreadyExistsException;
-import dev.corusoft.eticketia.domain.exceptions.auth.UserNotFoundException;
-import dev.corusoft.eticketia.infrastructure.services.firebase.FirebaseExceptionHandler;
-import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.EmailAlreadyExistsFirebaseAuthHandler;
-import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.FirebaseAuthExceptionHandler;
-import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.UserAlreadyExistsFirebaseAuthHandler;
-import dev.corusoft.eticketia.infrastructure.services.firebase.handlers.UserNotFoundFirebaseAuthHandler;
-import dev.corusoft.eticketia.infrastructure.usecases.auth.signup.FirebaseEmailPasswordSignUpUseCaseImpl;
-import dev.corusoft.eticketia.testing.integration.BaseIT;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import lombok.extern.log4j.Log4j2;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 @Log4j2
 public class FirebaseEmailPasswordSignUpUseCaseIT extends BaseIT {
@@ -111,7 +98,7 @@ public class FirebaseEmailPasswordSignUpUseCaseIT extends BaseIT {
 
     // Assert
     assertThat(output).isNotNull();
-    assertThat(output.signedUpUser().getUid()).isEqualTo(uid);
+    assertThat(output.signedUpUser().getId()).isEqualTo(uid);
     assertThat(output.signedUpUser().getEmail()).isEqualTo(useCaseInput.email());
     assertThat(output.signedUpUser().getDisplayName()).isEqualTo(useCaseInput.nickname());
     assertThat(output.signedUpUser().getRegistrationDate()).isBeforeOrEqualTo(LocalDateTime.now());

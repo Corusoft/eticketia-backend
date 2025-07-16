@@ -2,24 +2,24 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.3</version>
     </parent>
-    
+
     <groupId>dev.corusoft.eticketia</groupId>
     <artifactId>eticketia-backend-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
     <description>Parent module with dependencies and common project configuration</description>
     <inceptionYear>2025</inceptionYear>
-    
+
     <prerequisites>
         <maven>3.9.8</maven>
     </prerequisites>
-    
+
     <modules>
         <module>eticketia-domain</module>
         <module>eticketia-application</module>
@@ -27,18 +27,18 @@
         <module>eticketia-testing</module>
         <module>eticketia-server</module>
     </modules>
-    
+
     <properties>
         <revision>0.1-SNAPSHOT</revision>
         <project.classifier>spring-boot-application</project.classifier>
-        
+
         <!-- Project properties -->
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.finalName>${project.artifactId}_${project.version}</project.build.finalName>
-        
+
         <!-- CI/CD configuration -->
         <sonar.projectKey>Corusoft_eticketia-backend</sonar.projectKey>
         <sonar.organization>corusoft</sonar.organization>
@@ -48,7 +48,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.reporting.outputDirectory}/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        
+
         <!-- Dependencies versioning -->
         <spring-boot-starter>3.5.0</spring-boot-starter>
         <spring-boot-configuration-processor>${spring-boot-starter}</spring-boot-configuration-processor>
@@ -70,7 +70,7 @@
         <firestore>3.26.5</firestore>
         <firebase-admin>9.4.1</firebase-admin>
         <mindee>4.32.1</mindee>
-        
+
         <!-- Plugins -->
         <spring-boot-maven-plugin>${spring-boot-starter}</spring-boot-maven-plugin>
         <maven-checkstyle-plugin>3.6.0</maven-checkstyle-plugin>
@@ -83,8 +83,9 @@
         <maven-resources-plugin>3.3.1</maven-resources-plugin>
         <maven-surefire-plugin>3.5.3</maven-surefire-plugin>
         <maven-sonar-plugin>4.0.0.4121</maven-sonar-plugin>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
     </properties>
-    
+
     <dependencies>
         <!-- Log4J2 -->
         <dependency>
@@ -92,7 +93,7 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j2.version}</version>
         </dependency>
-        
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -100,7 +101,7 @@
             <version>${lombok.version}</version>
             <scope>compile</scope>
         </dependency>
-        
+
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -148,12 +149,7 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot-starter-web}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-jpa</artifactId>-->
-<!--            <version>${spring-boot-starter-data-jpa}</version>-->
-<!--        </dependency>-->
-        
+
         <!-- Serialization -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -167,11 +163,37 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
         </dependency>
-        
+
         <!-- Apache utils -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <!--            <version>${commons-lang3.version}</version>-->
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <!-- Firebase -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>${firebase-admin}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-firestore</artifactId>
+            <version>${firestore}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -190,14 +212,18 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <build>
         <finalName>${project.build.finalName}</finalName>
-        
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -240,7 +266,7 @@
                                 <goal>prepare-agent</goal>
                             </goals>
                         </execution>
-                        
+
                         <execution>
                             <id>prepare-jacoco-agent-for-integration-test</id>
                             <phase>compile</phase>
@@ -248,7 +274,7 @@
                                 <goal>prepare-agent-integration</goal>
                             </goals>
                         </execution>
-                        
+
                         <execution>
                             <id>report-integration-test</id>
                             <phase>post-integration-test</phase>
@@ -256,7 +282,7 @@
                                 <goal>report-integration</goal>
                             </goals>
                         </execution>
-                        
+
                         <execution>
                             <id>generate-project-coverage-reports</id>
                             <phase>verify</phase>
@@ -270,12 +296,12 @@
                             <dataFileInclude>**/jacoco.exec</dataFileInclude>
                             <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
                         </dataFileIncludes>
-                    
+
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
-        
+
         <plugins>
             <!-- Code formatting -->
             <plugin>
@@ -305,7 +331,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- Maven compiler configuration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -323,7 +349,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            
+
             <!-- Skip unit tests by default -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -333,7 +359,7 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
-            
+
             <!-- Skip integration tests by default -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -343,11 +369,11 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
-        
+
         </plugins>
-    
+
     </build>
-    
+
     <profiles>
         <!-- Development profile: dev  -->
         <profile>
@@ -361,9 +387,9 @@
                 <!-- Skip tests -->
                 <maven.test.skip>true</maven.test.skip>
             </properties>
-        
+
         </profile>
-        
+
         <!-- Production profile: prod -->
         <profile>
             <id>production</id>
@@ -373,7 +399,7 @@
                 <!-- Skip tests -->
                 <maven.test.skip>true</maven.test.skip>
             </properties>
-            
+
             <build>
                 <plugins>
                     <!-- Force project to be production ready -->
@@ -402,7 +428,7 @@
                 </plugins>
             </build>
         </profile>
-    
+
     </profiles>
 
 </project>
