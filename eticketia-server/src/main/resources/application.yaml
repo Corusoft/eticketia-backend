@@ -10,6 +10,12 @@ spring:
   threads:
     virtual:
       enabled: true
+  server:
+    multipart:
+      enabled: true
+      max-file-sie: 20MB
+      max-request-size: 20MB
+      file-size-threshold: 1MB
 
 server:
   http2:
