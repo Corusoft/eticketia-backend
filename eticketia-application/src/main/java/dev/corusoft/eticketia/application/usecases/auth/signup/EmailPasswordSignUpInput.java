@@ -16,13 +16,9 @@ import jakarta.validation.constraints.Size;
  * @param password User password
  */
 public record EmailPasswordSignUpInput(
-    @NotNull
-    @Email
-    String email,
-    @NotNull
-    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH)
-    String password,
-    @NotBlank
-    String nickname
+    @NotNull @Email String email,
+    @NotNull @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH) String password,
+    @NotBlank String nickname
 ) implements UseCaseInput {
+
 }

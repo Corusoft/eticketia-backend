@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiPaths {
+
   // region Auth
   public static final String BASE_AUTH = "/auth";
 
@@ -15,4 +16,20 @@ public class ApiPaths {
 
   // endregion Auth
 
+  // region Ticket
+  public static final String BASE_TICKET = "/tickets";
+
+  public static final String TICKET_SCAN = BASE_TICKET + "/scan";
+  public static final String TICKET_BY_ID_FORMAT = BASE_TICKET + "/{%s}";
+  public static final String TICKET_BY_ID = TICKET_BY_ID_FORMAT.formatted("id");
+
+  // endregion Ticket
+
+  // region User
+  public static final String BASE_USER = "/users";
+
+  public static final String USER_BY_ID_FORMAT = BASE_USER + "/{%s}";
+  public static final String USER_BY_ID = USER_BY_ID_FORMAT.formatted("id");
+
+  // endregion User
 }

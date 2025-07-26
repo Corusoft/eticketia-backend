@@ -1,24 +1,29 @@
 package dev.corusoft.eticketia.infrastructure.usecases.auth.signup;
 
-import com.google.firebase.auth.*;
+import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.DEFAULT_NEW_USER_ROLE;
+import static dev.corusoft.eticketia.infrastructure.security.SecurityConstants.USER_ROLES_CLAIM;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.auth.UserRecord.UpdateRequest;
-import dev.corusoft.eticketia.application.usecases.auth.signup.*;
+import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpInput;
+import dev.corusoft.eticketia.application.usecases.auth.signup.EmailPasswordSignUpUseCase;
+import dev.corusoft.eticketia.application.usecases.auth.signup.UserSignUpOutput;
 import dev.corusoft.eticketia.domain.entities.roles.RoleName;
 import dev.corusoft.eticketia.domain.entities.users.User;
 import dev.corusoft.eticketia.domain.exceptions.DomainException;
 import dev.corusoft.eticketia.infrastructure.services.firebase.FirebaseExceptionHandler;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Map;
+import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
-import java.time.*;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static dev.corusoft.eticketia.application.usecases.auth.AuthConstraints.DEFAULT_NEW_USER_ROLE;
-import static dev.corusoft.eticketia.infrastructure.security.SecurityConstants.USER_ROLES_CLAIM;
 
 /**
  * Implementation of {@link EmailPasswordSignUpUseCase} using Firebase Authentication.
@@ -28,6 +33,7 @@ import static dev.corusoft.eticketia.infrastructure.security.SecurityConstants.U
 @RequiredArgsConstructor
 @Log4j2
 public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswordSignUpUseCase {
+
   private final FirebaseAuth firebaseAuth;
   private final FirebaseExceptionHandler firebaseExceptionHandler;
 
@@ -67,6 +73,54 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
     return buildOutput(createdUser);
   }
 
+  public UserRecord doCreateUser(EmailPasswordSignUpInput input) throws DomainException {
+    CreateRequest createRequest = new CreateRequest()
+        .setEmail(input.email())
+        .setPassword(input.password())
+        .setDisplayName(input.nickname());
+
+    try {
+      return firebaseAuth.createUser(createRequest);
+    } catch (FirebaseAuthException e) {
+      DomainException ex = firebaseExceptionHandler.toDomainException(e, input);
+      log.warn("Error creating new user: {}", input.nickname(), ex);
+      throw ex;
+    }
+  }
+
+  // region auxiliar methods
+
+  public UserRecord doAssignRoles(UserRecord user) throws DomainException {
+    Map<String, Object> customClaims = buildNewUserClaims();
+    UpdateRequest updateRequest = new UpdateRequest(user.getUid())
+        .setCustomClaims(customClaims);
+
+    try {
+      return firebaseAuth.updateUser(updateRequest);
+    } catch (FirebaseAuthException e) {
+      DomainException ex = firebaseExceptionHandler.toDomainException(e);
+      log.warn("Error assigning default role for user '{}'", user.getDisplayName());
+      throw ex;
+    }
+  }
+
+  public static Map<String, Object> buildNewUserClaims() {
+    Map<String, Object> customClaims = new TreeMap<>();
+
+    customClaims.put(USER_ROLES_CLAIM, DEFAULT_NEW_USER_ROLE.getName());
+
+    return customClaims;
+  }
+
+  private String generateToken(UserRecord user) throws DomainException {
+    try {
+      return firebaseAuth.createCustomToken(user.getUid());
+    } catch (FirebaseAuthException e) {
+      DomainException ex = firebaseExceptionHandler.toDomainException(e);
+      log.warn("Error generating token for user '{}'", user.getDisplayName());
+      throw ex;
+    }
+  }
 
   @Override
   public UserSignUpOutput buildOutput(Object result) {
@@ -88,45 +142,14 @@ public final class FirebaseEmailPasswordSignUpUseCaseImpl implements EmailPasswo
         .role(role)
         .build();
 
-    return new UserSignUpOutput(user);
-  }
-
-  // region auxiliar methods
-
-  public UserRecord doCreateUser(EmailPasswordSignUpInput input) throws DomainException {
-    CreateRequest createRequest = new CreateRequest()
-        .setEmail(input.email())
-        .setPassword(input.password())
-        .setDisplayName(input.nickname());
-
+    String userToken;
     try {
-      return firebaseAuth.createUser(createRequest);
-    } catch (FirebaseAuthException e) {
-      DomainException ex = firebaseExceptionHandler.toDomainException(e, input);
-      log.warn("Error creating new user: {}", input.nickname(), ex);
-      throw ex;
+      userToken = generateToken(userRecord);
+    } catch (DomainException e) {
+      throw new RuntimeException(e);
     }
-  }
 
-  public UserRecord doAssignRoles(UserRecord user) throws DomainException {
-    Map<String, Object> customClaims = buildNewUserClaims();
-    UpdateRequest updateRequest = new UpdateRequest(user.getUid())
-        .setCustomClaims(customClaims);
-
-    try {
-      return firebaseAuth.updateUser(updateRequest);
-    } catch (FirebaseAuthException e) {
-      DomainException ex = firebaseExceptionHandler.toDomainException(e);
-      log.warn("Error assigning default role for user '{}'", user.getDisplayName());
-      throw ex;
-    }
-  }
-
-  public static Map<String, Object> buildNewUserClaims() {
-    Map<String, Object> customClaims = new TreeMap<>();
-    customClaims.put(USER_ROLES_CLAIM, DEFAULT_NEW_USER_ROLE.getName());
-
-    return customClaims;
+    return new UserSignUpOutput(user, userToken);
   }
 
   // endregion auxiliar methods

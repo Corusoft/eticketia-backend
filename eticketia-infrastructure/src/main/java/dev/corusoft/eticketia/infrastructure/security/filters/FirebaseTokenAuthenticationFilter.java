@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +42,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
     implements CustomSecurityFilter {
+
   private static final List<String> PUBLIC_ENDPOINTS = List.of(
       ApiPaths.AUTH_SIGNUP
   );
@@ -51,7 +51,7 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
 
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res,
-                                  @NonNull FilterChain chain) throws ServletException, IOException {
+      @NonNull FilterChain chain) throws ServletException, IOException {
     if (!canApplyFilter(req)) {
       chain.doFilter(req, res);
       return;
@@ -67,7 +67,6 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
       throw new ServletException(e);
     }
 
-
     // Continue filtering requests
     chain.doFilter(req, res);
   }
@@ -82,25 +81,6 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
     }
   }
 
-  private boolean isPublicEndpoint(HttpServletRequest req) {
-    String path = req.getServletPath();
-
-    return PUBLIC_ENDPOINTS.contains(path);
-  }
-
-  private UsernamePasswordAuthenticationToken buildAuthenticationToken(FirebaseToken token,
-                                                                       HttpServletRequest req) {
-    // Add user related values from token into security context
-    req.setAttribute(USER_ID_ATTRIBUTE_NAME, token.getUid());
-    FirebaseAuthenticatedUserDetails userDetails = new FirebaseAuthenticatedUserDetails(token);
-
-    // Set user roles
-    Set<GrantedAuthority> authorities = createAuthorities(token);
-
-    return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-  }
-
-
   private String extractTokenFromRequest(HttpServletRequest req) throws BadCredentialsException {
     // Check response contains Authorization header
     String authHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
@@ -111,7 +91,7 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
     }
 
     // Remove "Bearer " from header
-    String token = authHeader.replace(PREFIX_BEARER_TOKEN, "");
+    String token = authHeader.replace(PREFIX_BEARER_TOKEN, "").strip();
     if (StringUtils.isBlank(token)) {
       log.debug("Could not extract JWT token from request or it is malformed");
       throw new BadCredentialsException("Non existent or malformed token in request");
@@ -120,34 +100,47 @@ public class FirebaseTokenAuthenticationFilter extends OncePerRequestFilter
     return token;
   }
 
+  private UsernamePasswordAuthenticationToken buildAuthenticationToken(FirebaseToken token,
+      HttpServletRequest req) {
+    // Add user related values from token into security context
+    req.setAttribute(USER_ID_ATTRIBUTE_NAME, token.getUid());
+    FirebaseAuthenticatedUserDetails userDetails = new FirebaseAuthenticatedUserDetails(token);
+
+    // Set user roles
+    Set<GrantedAuthority> authorities = createAuthorities(token);
+
+    return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+  }
+
+  private boolean isPublicEndpoint(HttpServletRequest req) {
+    String path = req.getServletPath();
+
+    return PUBLIC_ENDPOINTS.contains(path);
+  }
+
   private Set<GrantedAuthority> createAuthorities(FirebaseToken token) {
-    Set<RoleName> roles = extractRolesFromToken(token);
-    if (roles.isEmpty()) {
+    RoleName role = extractRoleFromToken(token);
+    if (role == null) {
       return Collections.emptySet();
     }
 
     log.debug("Registering granted authorities for user '{}'", token.getName());
-    Set<GrantedAuthority> authorities = HashSet.newHashSet(roles.size());
-    roles.stream()
-        .map(RoleName::getName)
-        .map(SimpleGrantedAuthority::new)
-        .forEach(authorities::add);
+    Set<GrantedAuthority> authorities = HashSet.newHashSet(1);
+    authorities.add(new SimpleGrantedAuthority(role.getName()));
 
     log.debug("Granted authorities registered for user '{}'", token.getName());
     return authorities;
   }
 
   @SuppressWarnings("unchecked")
-  private Set<RoleName> extractRolesFromToken(FirebaseToken token) {
+  private RoleName extractRoleFromToken(FirebaseToken token) {
     Map<String, Object> claims = token.getClaims();
     if (claims == null) {
       log.debug("User '{}' has no roles assigned", token.getName());
-      return Collections.emptySet();
+      return null;
     }
-    Set<String> rolesClaim = (Set<String>) claims.get(USER_ROLES_CLAIM);
+    String roleClaim = (String) claims.get(USER_ROLES_CLAIM);
 
-    return rolesClaim.stream()
-        .map(RoleName::valueOf)
-        .collect(Collectors.toUnmodifiableSet());
+    return RoleName.valueOf(roleClaim);
   }
 }

@@ -15,16 +15,13 @@ import dev.corusoft.eticketia.domain.entities.tickets.enums.TicketCategory;
 import dev.corusoft.eticketia.domain.entities.tickets.enums.TicketDocumentType;
 import dev.corusoft.eticketia.domain.entities.tickets.enums.TicketSubcategory;
 import dev.corusoft.eticketia.domain.exceptions.DomainException;
+import dev.corusoft.eticketia.domain.exceptions.PersistenceErrorException;
 import dev.corusoft.eticketia.domain.exceptions.ticket.UnableToParseTicketException;
+import dev.corusoft.eticketia.domain.repositories.tickets.TicketRepository;
 import dev.corusoft.eticketia.infrastructure.services.mindee.MindeeAdapter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Currency;
 import java.util.List;
-import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;
@@ -37,9 +34,10 @@ import org.springframework.stereotype.Service;
 @Lazy
 @Log4j2
 @RequiredArgsConstructor
-public class MindeeTicketScanUseCaseImpl implements ScanTicketUseCase {
+public class MindeeScanTicketUseCaseImpl implements ScanTicketUseCase {
 
   private final MindeeClient mindee;
+  private final TicketRepository ticketRepository;
 
   @Override
   public String getUseCaseName() {
@@ -55,45 +53,67 @@ public class MindeeTicketScanUseCaseImpl implements ScanTicketUseCase {
    */
   @Override
   public ScanTicketOutput execute(ScanTicketInput input) throws DomainException {
-    String fileName = "temp_%s_%s".formatted(input.userId(), input.scanTimestamp().getTime());
-    LocalInputSource imageSource = new LocalInputSource(input.imageFile(), fileName);
+    Ticket parsedTicket = parseTicketContent(input);
+    saveTicket(parsedTicket);
 
-    ReceiptV5Document receiptDocument;
-    try {
-      PredictResponse<ReceiptV5> predictResponse = mindee.parse(ReceiptV5.class, imageSource);
-      receiptDocument = predictResponse.getDocument()
-          .getInference()
-          .getPrediction();
-
-      // TODO guardar ticket en firestore
-
-    } catch (IOException e) {
-      log.error("Error scanning ticket content", e);
-      throw new UnableToParseTicketException();
-    }
-
-    return buildOutput(receiptDocument);
+    return buildOutput(parsedTicket);
   }
+
 
   @Override
   public ScanTicketOutput buildOutput(Object result) {
-    ReceiptV5Document document = (ReceiptV5Document) result;
-    TicketCategory category = MindeeAdapter.toTicketCategory(document.getCategory());
-    TicketSubcategory subcategory = MindeeAdapter.toTicketSubcategory(document.getSubcategory());
-    TicketDocumentType documentType = MindeeAdapter.toTicketDocumentType(
-        document.getDocumentType());
-    LocalDate date = document.getDate().getValue();
-    LocalTime time = LocalTime.parse(document.getTime().getValue(), DateTimeFormatter.ISO_TIME);
-    List<TicketLineItem> lineItems = MindeeAdapter.toLineItemsList(document.getLineItems());
-    String supplierName = document.getSupplierName().getValue();
-    String receiptNumber = document.getReceiptNumber().getValue();
-    List<TicketTax> taxes = MindeeAdapter.toTicketTaxList(document.getTaxes());
-    BigDecimal totalNet = BigDecimal.valueOf(document.getTotalNet().getValue());
-    BigDecimal totalAmount = BigDecimal.valueOf(document.getTotalAmount().getValue());
-    Locale locale = Locale.of(document.getLocale().getValue());
-    Currency currency = Currency.getInstance(locale);
+    Ticket ticket = (Ticket) result;
+    return new ScanTicketOutput(ticket);
+  }
 
-    Ticket ticket = Ticket.builder()
+  private Ticket parseTicketContent(ScanTicketInput input) throws UnableToParseTicketException {
+    String fileName = "temp_%s_%s".formatted(input.userId(), input.scanTimestamp().getTime());
+    LocalInputSource imageSource = new LocalInputSource(input.imageFile(), fileName);
+
+    Ticket parsedTicket;
+    log.debug("Parsing ticket content...");
+    try {
+      PredictResponse<ReceiptV5> prediction = mindee.parse(ReceiptV5.class, imageSource);
+      ReceiptV5Document receiptDocument = prediction.getDocument()
+          .getInference()
+          .getPrediction();
+      parsedTicket = buildTicketFromDocument(receiptDocument);
+    } catch (IOException e) {
+      log.error("Error parsing ticket content", e);
+      throw new UnableToParseTicketException();
+    }
+    log.debug("Ticket parsed successfully");
+
+    return parsedTicket;
+  }
+
+  private void saveTicket(Ticket ticket) throws PersistenceErrorException {
+    log.debug("Saving ticket...");
+    try {
+      ticketRepository.save(ticket);
+    } catch (PersistenceErrorException e) {
+      log.error("Error saving ticket in Firebase", e);
+      throw e;
+    }
+    log.debug("Ticket saved successfully");
+  }
+
+  private static Ticket buildTicketFromDocument(ReceiptV5Document doc) {
+    TicketCategory category = MindeeAdapter.toTicketCategory(doc.getCategory());
+    TicketSubcategory subcategory = MindeeAdapter.toTicketSubcategory(doc.getSubcategory());
+    TicketDocumentType documentType = MindeeAdapter.toTicketDocumentType(doc.getDocumentType());
+    String date = MindeeAdapter.toDate(doc.getDate());
+    String time = MindeeAdapter.toTime(doc.getTime()).toString();
+    List<TicketLineItem> lineItems = MindeeAdapter.toLineItemsList(doc.getLineItems());
+    String supplierName = doc.getSupplierName().getValue();
+    String receiptNumber = doc.getReceiptNumber().getValue();
+    List<TicketTax> taxes = MindeeAdapter.toTicketTaxList(doc.getTaxes());
+    BigDecimal totalNet = MindeeAdapter.toBigDecimal(doc.getTotalNet());
+    BigDecimal totalAmount = MindeeAdapter.toBigDecimal(doc.getTotalAmount());
+    String locale = MindeeAdapter.toLocale(doc.getLocale()).toLanguageTag();
+    String currency = MindeeAdapter.toCurrency(doc).toString();
+
+    return Ticket.builder()
         .category(category)
         .subcategory(subcategory)
         .documentType(documentType)
@@ -105,12 +125,10 @@ public class MindeeTicketScanUseCaseImpl implements ScanTicketUseCase {
         .totalNet(totalNet)
         .totalAmount(totalAmount)
         .locale(locale)
-        .country(document.getLocale().getCountry())
+        .country(doc.getLocale().getCountry())
         .currency(currency)
         .taxes(taxes)
         .metadata(null)
         .build();
-
-    return new ScanTicketOutput(ticket);
   }
 }

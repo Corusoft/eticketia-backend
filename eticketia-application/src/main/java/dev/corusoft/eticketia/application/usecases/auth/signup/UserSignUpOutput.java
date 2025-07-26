@@ -7,6 +7,8 @@ import dev.corusoft.eticketia.domain.entities.users.User;
  * User data after executing a sign up.
  */
 public record UserSignUpOutput(
-    User signedUpUser
+    User signedUpUser,
+    String token
 ) implements UseCaseOutput {
+
 }

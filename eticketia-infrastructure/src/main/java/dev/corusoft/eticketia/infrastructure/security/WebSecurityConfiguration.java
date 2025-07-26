@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Log4j2
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
+
   /**
    * List that holds the endpoint access configurations for each Rest controller
    */
@@ -48,22 +50,22 @@ public class WebSecurityConfiguration {
     return http.build();
   }
 
-  private static HttpSecurity configureCsrf(HttpSecurity http) {
-    return http;
-    // Disable CSRF as it not being used (CSRF only affects Sessions and Cookies, not JWT)
-    //.csrf(AbstractHttpConfigurer::disable);
+  private void configureFilters(HttpSecurity http) {
+    FirebaseTokenAuthenticationFilter firebaseFilter =
+        getRegisteredFilter(FirebaseTokenAuthenticationFilter.class);
+    http.addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class);
+  }
+
+  private static HttpSecurity configureCsrf(HttpSecurity http) throws Exception {
+    return http
+        // Disable CSRF as it not being used (CSRF only affects Sessions and Cookies, not JWT)
+        .csrf(AbstractHttpConfigurer::disable);
   }
 
   private static HttpSecurity configureSessions(HttpSecurity http) throws Exception {
     return http
         // Do not store user Sessions (Stateless API)
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-  }
-
-  private void configureFilters(HttpSecurity http) {
-    FirebaseTokenAuthenticationFilter firebaseFilter =
-        getRegisteredFilter(FirebaseTokenAuthenticationFilter.class);
-    http.addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class);
   }
 
   private void secureEndpoints(HttpSecurity http) throws Exception {

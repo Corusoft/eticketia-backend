@@ -8,14 +8,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-
+/**
+ * Parameters to sign up a new user using Firebase implementation.
+ */
 public record FirebaseEmailPasswordSignUpInputDTO(
-    @NotNull
-    @Email
-    String email,
-    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH)
-    String password,
-    @NotBlank
-    String nickname
+    @NotNull @Email String email,
+    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH) String password,
+    @NotBlank String nickname
 ) {
+
 }
