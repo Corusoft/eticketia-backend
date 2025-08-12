@@ -10,6 +10,7 @@ import dev.corusoft.eticketia.application.usecases.ticket.scan.ScanTicketOutput;
 import dev.corusoft.eticketia.application.usecases.ticket.scan.ScanTicketUseCase;
 import dev.corusoft.eticketia.domain.entities.tickets.Ticket;
 import dev.corusoft.eticketia.domain.entities.tickets.TicketLineItem;
+import dev.corusoft.eticketia.domain.entities.tickets.TicketMetadata;
 import dev.corusoft.eticketia.domain.entities.tickets.TicketTax;
 import dev.corusoft.eticketia.domain.entities.tickets.enums.TicketCategory;
 import dev.corusoft.eticketia.domain.entities.tickets.enums.TicketDocumentType;
@@ -28,7 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of {@link ScanTicketUseCase} using Mindee}
+ * Implementation of {@link ScanTicketUseCase} using Mindee}.
  */
 @Service
 @Lazy
@@ -78,6 +79,11 @@ public class MindeeScanTicketUseCaseImpl implements ScanTicketUseCase {
           .getInference()
           .getPrediction();
       parsedTicket = buildTicketFromDocument(receiptDocument);
+      // Set OCR response in ticket metadata
+      TicketMetadata metadata = TicketMetadata.builder()
+          .rawOcrResponse(receiptDocument.toString())
+          .build();
+      parsedTicket.setMetadata(metadata);
     } catch (IOException e) {
       log.error("Error parsing ticket content", e);
       throw new UnableToParseTicketException();
@@ -91,6 +97,8 @@ public class MindeeScanTicketUseCaseImpl implements ScanTicketUseCase {
     log.debug("Saving ticket...");
     try {
       ticketRepository.save(ticket);
+      // TODO Guardar ticket en un bucket en Firebase, recuperar datos y guardar en metadatos
+
     } catch (PersistenceErrorException e) {
       log.error("Error saving ticket in Firebase", e);
       throw e;
@@ -98,7 +106,7 @@ public class MindeeScanTicketUseCaseImpl implements ScanTicketUseCase {
     log.debug("Ticket saved successfully");
   }
 
-  private static Ticket buildTicketFromDocument(ReceiptV5Document doc) {
+  private Ticket buildTicketFromDocument(ReceiptV5Document doc) {
     TicketCategory category = MindeeAdapter.toTicketCategory(doc.getCategory());
     TicketSubcategory subcategory = MindeeAdapter.toTicketSubcategory(doc.getSubcategory());
     TicketDocumentType documentType = MindeeAdapter.toTicketDocumentType(doc.getDocumentType());
@@ -128,7 +136,12 @@ public class MindeeScanTicketUseCaseImpl implements ScanTicketUseCase {
         .country(doc.getLocale().getCountry())
         .currency(currency)
         .taxes(taxes)
-        .metadata(null)
+        .build();
+  }
+
+  private TicketMetadata generateTicketMetadata(ScanTicketInput input, ReceiptV5Document document) {
+    return TicketMetadata.builder()
+        .scanTimestamp(input.scanTimestamp())
         .build();
   }
 }
