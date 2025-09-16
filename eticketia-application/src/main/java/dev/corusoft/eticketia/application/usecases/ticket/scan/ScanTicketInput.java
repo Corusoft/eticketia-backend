@@ -14,6 +14,7 @@ import java.util.Date;
  */
 public record ScanTicketInput(
     @NotNull byte[] imageFile,
+    @NotNull String fileName,
     @NotNull @PastOrPresent Date scanTimestamp,
     @NotBlank String userId
 ) implements UseCaseInput {

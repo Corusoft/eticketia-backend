@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.cloud.StorageClient;
 import dev.corusoft.eticketia.infrastructure.config.EnvironmentConfiguration;
 import dev.corusoft.eticketia.infrastructure.config.EnvironmentVariables;
 import java.io.ByteArrayInputStream;
@@ -47,12 +48,14 @@ public class FirebaseConfiguration {
       return existingApp.get();
     }
 
-    String firebaseCredentials = env.getProperty(EnvironmentVariables.FIREBASE_CREDENTIALS);
-    InputStream credentialStreams = new ByteArrayInputStream(firebaseCredentials.getBytes());
+    String FIREBASE_CREDENTIALS = env.getProperty(EnvironmentVariables.FIREBASE_CREDENTIALS);
+    String FIREBASE_STORAGE_BUCKET_NAME = env.getProperty(EnvironmentVariables.FIREBASE_STORAGE_BUCKET_NAME);
+    InputStream credentialStreams = new ByteArrayInputStream(FIREBASE_CREDENTIALS.getBytes());
 
     GoogleCredentials credentials = GoogleCredentials.fromStream(credentialStreams);
     FirebaseOptions firebaseOptions = FirebaseOptions.builder()
         .setCredentials(credentials)
+        .setStorageBucket(FIREBASE_STORAGE_BUCKET_NAME)
         .build();
     FirebaseApp initializedApp = FirebaseApp.initializeApp(firebaseOptions, applicationName);
     log.debug("Firebase App '{}' initialized", initializedApp.getName());
@@ -82,5 +85,17 @@ public class FirebaseConfiguration {
     log.debug("Firebase Firestore database initialized");
 
     return firestore;
+  }
+
+  /**
+   * Initialize the {@link StorageClient}
+   */
+  @Lazy
+  @Bean
+  public StorageClient storageClient(FirebaseApp firebaseApp) {
+    StorageClient client = StorageClient.getInstance(firebaseApp);
+    log.debug("Firebase Storage client initialized");
+
+    return client;
   }
 }

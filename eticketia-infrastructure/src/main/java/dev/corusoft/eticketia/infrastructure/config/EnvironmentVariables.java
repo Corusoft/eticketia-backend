@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum EnvironmentVariables {
   FIREBASE_CREDENTIALS("firebase_credentials", true),
-  MINDEE_API_KEY("mindee_api_key", true)
-  ;
+  FIREBASE_STORAGE_BUCKET_NAME("firebase_storage_bucket_name", true),
+  MINDEE_API_KEY("mindee_api_key", true);
 
   private static final String ENCODED_SUFFIX = ".encoded";
   /**

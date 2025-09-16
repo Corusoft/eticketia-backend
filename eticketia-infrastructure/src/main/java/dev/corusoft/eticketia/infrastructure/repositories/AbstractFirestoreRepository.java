@@ -52,7 +52,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error saving entity in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
 
     return entity;
@@ -104,7 +104,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error batch saving entities in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
 
     return entities;
@@ -124,7 +124,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error finding entity by ID in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -139,7 +139,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error checking existence of entity by ID in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -154,7 +154,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error finding all entities in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -168,7 +168,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error counting entities in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -203,7 +203,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error batch deleting entities by ID in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -224,7 +224,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error batch deleting entities in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -242,7 +242,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error finding and sorting all entities in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
@@ -283,7 +283,7 @@ public abstract class AbstractFirestoreRepository<T extends Identifiable> implem
       Thread.currentThread().interrupt();
       String message = "Error finding and paging all entities in Firestore";
       log.error(message, e);
-      throw new PersistenceErrorException(e, message);
+      throw new PersistenceErrorException(message, e);
     }
   }
 

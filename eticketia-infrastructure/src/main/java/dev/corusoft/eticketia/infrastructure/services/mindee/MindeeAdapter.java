@@ -9,6 +9,7 @@ import com.mindee.parsing.standard.TaxField;
 import com.mindee.parsing.standard.Taxes;
 import com.mindee.product.receipt.ReceiptV5Document;
 import com.mindee.product.receipt.ReceiptV5LineItem;
+import dev.corusoft.eticketia.domain.entities.tickets.Ticket;
 import dev.corusoft.eticketia.domain.entities.tickets.TicketLineItem;
 import dev.corusoft.eticketia.domain.entities.tickets.TicketTax;
 import dev.corusoft.eticketia.domain.entities.tickets.enums.TicketCategory;
@@ -29,6 +30,41 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MindeeAdapter {
+
+  public static Ticket toTicket(ReceiptV5Document mindeeDocument) {
+    TicketCategory category = MindeeAdapter.toTicketCategory(mindeeDocument.getCategory());
+    TicketSubcategory subcategory = MindeeAdapter.toTicketSubcategory(
+        mindeeDocument.getSubcategory());
+    TicketDocumentType documentType = MindeeAdapter.toTicketDocumentType(
+        mindeeDocument.getDocumentType());
+    String date = MindeeAdapter.toDate(mindeeDocument.getDate());
+    String time = MindeeAdapter.toTime(mindeeDocument.getTime()).toString();
+    List<TicketLineItem> lineItems = MindeeAdapter.toLineItemsList(mindeeDocument.getLineItems());
+    String supplierName = mindeeDocument.getSupplierName().getValue();
+    String receiptNumber = mindeeDocument.getReceiptNumber().getValue();
+    List<TicketTax> taxes = MindeeAdapter.toTicketTaxList(mindeeDocument.getTaxes());
+    BigDecimal totalNet = MindeeAdapter.toBigDecimal(mindeeDocument.getTotalNet());
+    BigDecimal totalAmount = MindeeAdapter.toBigDecimal(mindeeDocument.getTotalAmount());
+    String locale = MindeeAdapter.toLocale(mindeeDocument.getLocale()).toLanguageTag();
+    String currency = MindeeAdapter.toCurrency(mindeeDocument).toString();
+
+    return Ticket.builder()
+        .category(category)
+        .subcategory(subcategory)
+        .documentType(documentType)
+        .purchaseDate(date)
+        .purchaseTime(time)
+        .lineItems(lineItems)
+        .supplierName(supplierName)
+        .receiptNumber(receiptNumber)
+        .totalNet(totalNet)
+        .totalAmount(totalAmount)
+        .locale(locale)
+        .country(mindeeDocument.getLocale().getCountry())
+        .currency(currency)
+        .taxes(taxes)
+        .build();
+  }
 
   public static TicketCategory toTicketCategory(ClassificationField category) {
     return TicketCategory.fromString(category.getValue());
@@ -62,26 +98,8 @@ public class MindeeAdapter {
     return lineItems.stream().map(MindeeAdapter::toLineItem).toList();
   }
 
-  public static TicketLineItem toLineItem(ReceiptV5LineItem lineItem) {
-    return TicketLineItem.builder()
-        .description(lineItem.getDescription())
-        .quantity(lineItem.getQuantity())
-        .totalAmount(lineItem.getTotalAmount())
-        .unitPrice(lineItem.getUnitPrice())
-        .build();
-  }
-
   public static List<TicketTax> toTicketTaxList(Taxes taxes) {
     return taxes.stream().map(MindeeAdapter::toTicketTax).toList();
-  }
-
-  public static TicketTax toTicketTax(TaxField tax) {
-    return TicketTax.builder()
-        .value(tax.getValue())
-        .code(tax.getCode())
-        .rate(tax.getRate())
-        .base(tax.getBase())
-        .build();
   }
 
   public static BigDecimal toBigDecimal(AmountField ammountField) {
@@ -90,15 +108,6 @@ public class MindeeAdapter {
     }
 
     return BigDecimal.valueOf(ammountField.getValue());
-  }
-
-  public static Currency toCurrency(ReceiptV5Document document) {
-    Locale locale = toLocale(document.getLocale());
-    if (locale != null) {
-      return Currency.getInstance(locale);
-    }
-
-    return null;
   }
 
   public static Locale toLocale(LocaleField localeField) {
@@ -110,6 +119,33 @@ public class MindeeAdapter {
     }
 
     return Locale.of(localeField.getCountry());
+  }
+
+  public static Currency toCurrency(ReceiptV5Document document) {
+    Locale locale = toLocale(document.getLocale());
+    if (locale != null) {
+      return Currency.getInstance(locale);
+    }
+
+    return null;
+  }
+
+  public static TicketLineItem toLineItem(ReceiptV5LineItem lineItem) {
+    return TicketLineItem.builder()
+        .description(lineItem.getDescription())
+        .quantity(lineItem.getQuantity())
+        .totalAmount(lineItem.getTotalAmount())
+        .unitPrice(lineItem.getUnitPrice())
+        .build();
+  }
+
+  public static TicketTax toTicketTax(TaxField tax) {
+    return TicketTax.builder()
+        .value(tax.getValue())
+        .code(tax.getCode())
+        .rate(tax.getRate())
+        .base(tax.getBase())
+        .build();
   }
 
 }

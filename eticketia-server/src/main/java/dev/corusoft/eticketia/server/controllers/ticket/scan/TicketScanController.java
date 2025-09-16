@@ -56,7 +56,9 @@ public class TicketScanController implements EndpointSecurityConfigurer {
       @RequestParam("scanTimestamp") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date scanTimestamp)
       throws DomainException {
     byte[] ticketImageBytes = getBytesFromImage(imageFile);
-    ScanTicketInput input = new ScanTicketInput(ticketImageBytes, scanTimestamp, userId);
+    ScanTicketInput input = new ScanTicketInput(
+        ticketImageBytes, imageFile.getOriginalFilename(), scanTimestamp, userId
+    );
 
     ScanTicketOutput result = scanTicketUseCase.execute(input);
 
