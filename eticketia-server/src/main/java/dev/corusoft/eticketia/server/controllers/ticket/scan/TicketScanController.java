@@ -4,12 +4,12 @@ import static dev.corusoft.eticketia.infrastructure.web.ApiPaths.TICKET_SCAN;
 
 import dev.corusoft.eticketia.application.usecases.ticket.scan.ScanTicketInput;
 import dev.corusoft.eticketia.application.usecases.ticket.scan.ScanTicketOutput;
+import dev.corusoft.eticketia.application.usecases.ticket.scan.ScanTicketUseCase;
 import dev.corusoft.eticketia.domain.exceptions.DomainException;
 import dev.corusoft.eticketia.infrastructure.api.ApiResponse;
 import dev.corusoft.eticketia.infrastructure.api.ApiResponseBuilder;
 import dev.corusoft.eticketia.infrastructure.security.EndpointSecurityConfigurer;
 import dev.corusoft.eticketia.infrastructure.security.SecurityConstants;
-import dev.corusoft.eticketia.infrastructure.usecases.ticket.scan.MindeeScanTicketUseCaseImpl;
 import dev.corusoft.eticketia.infrastructure.web.ApiPaths;
 import java.io.IOException;
 import java.net.URI;
@@ -37,7 +37,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequiredArgsConstructor
 public class TicketScanController implements EndpointSecurityConfigurer {
 
-  private final MindeeScanTicketUseCaseImpl scanTicketUseCase;
+  private final ScanTicketUseCase scanTicketUseCase;
 
   @Override
   public void secureEndpoints(HttpSecurity httpSecurity) throws Exception {

@@ -17,5 +17,4 @@ public class TicketMetadata {
   private String rawOcrResponse;
   private Date scanTimestamp;
   private String uploadedImageUri;
-  private Date uploadedImageTimestamp;
 }

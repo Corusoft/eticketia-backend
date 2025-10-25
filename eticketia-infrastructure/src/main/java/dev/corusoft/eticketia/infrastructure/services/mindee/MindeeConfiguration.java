@@ -1,6 +1,6 @@
 package dev.corusoft.eticketia.infrastructure.services.mindee;
 
-import com.mindee.MindeeClient;
+import com.mindee.MindeeClientV2;
 import dev.corusoft.eticketia.infrastructure.config.EnvironmentConfiguration;
 import dev.corusoft.eticketia.infrastructure.config.EnvironmentVariables;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +15,14 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 @Configuration
 public class MindeeConfiguration {
-    private final EnvironmentConfiguration env;
+
+  private final EnvironmentConfiguration env;
 
 
-    @Bean
-    public MindeeClient mindeeClient() {
-        String mindeeApiKey = env.getProperty(EnvironmentVariables.MINDEE_API_KEY);
+  @Bean
+  public MindeeClientV2 mindeeClient() {
+    String mindeeApiKey = env.getProperty(EnvironmentVariables.MINDEE_API_KEY);
 
-        return new MindeeClient(mindeeApiKey);
-    }
+    return new MindeeClientV2(mindeeApiKey);
+  }
 }

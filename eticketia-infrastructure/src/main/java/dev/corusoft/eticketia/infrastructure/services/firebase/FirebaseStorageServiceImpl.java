@@ -3,6 +3,7 @@ package dev.corusoft.eticketia.infrastructure.services.firebase;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.StorageException;
 import com.google.firebase.cloud.StorageClient;
 import dev.corusoft.eticketia.application.services.StorageService;
 import dev.corusoft.eticketia.domain.exceptions.PersistenceErrorException;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 public class FirebaseStorageServiceImpl implements StorageService {
 
   private static final String STORAGE_PROTOCOL_PREFIX = "gs://";
-  private static final Path TEMPORAL_DOWNLOADS_PATH = Files.createTempFile()
 
   private final StorageClient storageClient;
 
@@ -60,8 +60,8 @@ public class FirebaseStorageServiceImpl implements StorageService {
   @Override
   public Map<String, String> uploadFiles(String basePath, List<File> files) throws PersistenceErrorException {
     Map<String, String> uploadedFilesMap = new HashMap<>(files.size());
+    int i = 0;
     for (File file : files) {
-      int i = 0;
       log.debug("Uploading file {}/{} '{}' to Firebase Storage", ++i, files.size(), file.getName());
       String uploadedFileUri = uploadFile(basePath, file);
       uploadedFilesMap.put(file.getName(), uploadedFileUri);
@@ -72,10 +72,9 @@ public class FirebaseStorageServiceImpl implements StorageService {
 
   @Override
   public File downloadFile(String path) throws PersistenceErrorException {
-    String bucketName = storageClient.bucket().getName();
     Blob blob = storageClient.bucket().get(path);
 
-    boolean existsFileInPath = (blob == null) && blob.exists();
+    boolean existsFileInPath = (blob != null) && blob.exists();
     if (!existsFileInPath) {
       String message = "File not found in Firebase Storage at path: %s".formatted(path);
       log.warn(message);
@@ -83,12 +82,55 @@ public class FirebaseStorageServiceImpl implements StorageService {
     }
 
     try {
-      Path tempFile
+      String fileName = new File(path).getName();
+      Path tempFilePath = createTemporaryFile(fileName);
+      blob.downloadTo(tempFilePath);
+      log.debug("File '{}' downloaded from Firebase Storage to temporary path '{}'", path, tempFilePath);
+      return tempFilePath.toFile();
+    } catch (StorageException e) {
+      String message = "Failed to download file '%s' from Firebase Storage".formatted(path);
+      log.error(message, e);
+      throw new PersistenceErrorException(message, e);
     }
   }
 
   @Override
   public boolean deleteFile(String path) throws PersistenceErrorException {
-    return false;
+    Blob blob = storageClient.bucket().get(path);
+
+    boolean existsFileInPath = (blob != null) && blob.exists();
+    if (!existsFileInPath) {
+      String message = "File not found in Firebase Storage at path: %s".formatted(path);
+      log.warn(message);
+      throw new PersistenceErrorException(message);
+    }
+
+    try {
+      return blob.delete();
+    } catch (StorageException e) {
+      String message = "Failed to delete file '%s' from Firebase Storage".formatted(path);
+      log.error(message, e);
+      throw new PersistenceErrorException(message, e);
+    }
   }
+
+  private Path createTemporaryFile(String fileName) throws PersistenceErrorException {
+    // Extract file name from the original file
+    try {
+      String prefix = fileName;
+      String suffix = null;
+      int extensionDotIndex = fileName.lastIndexOf('.');
+      if (extensionDotIndex > 0 && extensionDotIndex < fileName.length() - 1) {
+        prefix = fileName.substring(0, extensionDotIndex);
+        suffix = fileName.substring(extensionDotIndex);
+      }
+
+      return Files.createTempFile(prefix + "-", suffix);
+    } catch (IOException e) {
+      String message = "Could not allocate resources for downloading file from Firebase Storage";
+      log.error(message, e);
+      throw new PersistenceErrorException(message, e);
+    }
+  }
+
 }
